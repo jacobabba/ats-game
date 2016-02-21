@@ -4,14 +4,16 @@ function love.load()
     tileType = 1
     expandView = false --if true, show 9 levels on the screen
     showGrid = true
-    disableMouse = false
+    mouseHold = false
+    DATAFILE = "DATA.lua"
 
     world = require("world")
+    world:loadWorld(DATAFILE)
 end
 
 function love.update(dt)
-    local x = (love.mouse.getX() - love.mouse.getX() % 20)/20 + 1
-    local y = (love.mouse.getY() - love.mouse.getY() % 20)/20 + 1
+    local x = (love.mouse.getX() - love.mouse.getX() % world.TILE_SIZE)/world.TILE_SIZE + 1
+    local y = (love.mouse.getY() - love.mouse.getY() % world.TILE_SIZE)/world.TILE_SIZE + 1
 
     if not love.mouse.isDown(1, 2) then disableMouse = false end
 
@@ -29,7 +31,6 @@ function love.draw()
     world:drawLevel(levelX, levelY, showGrid, expandView)
     love.graphics.setColor(127, 127, 127)
     love.graphics.print("("..levelX..", "..levelY..")", 10, 10)
-    love.graphics.setColor(255, 255, 255)
 end
 
 function love.keypressed(key)
@@ -38,5 +39,6 @@ function love.keypressed(key)
     elseif key == "left" then levelX = levelX - 1
     elseif key == "right" then levelX = levelX + 1
     elseif key == "g" then showGrid = not showGrid
+    elseif key == "s" then world:saveWorld(DATAFILE)
     end
 end

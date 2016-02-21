@@ -42,6 +42,7 @@ end
 --TODO: implement expandView
 function w:drawLevel(levelX, levelY, showGrid, expandView)
     if self.levelGrid[levelX] == nil or self.levelGrid[levelX][levelY] == nil then
+        love.graphics.setColor(127, 127, 127)
         love.graphics.print("Level doesn't exist. Click to create.", 100, 100)
         return nil
     end

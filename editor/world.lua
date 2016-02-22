@@ -39,22 +39,21 @@ function w:newLevel(levelX, levelY, g)
 end
 
 --if expandview is on, then draw this levels, and all levels bordering it
---TODO: implement expandView
-function w:drawLevel(levelX, levelY, showGrid, expandView)
+function w:drawLevel(levelX, levelY, showGrid, x, y, scale)
     if self.levelGrid[levelX] == nil or self.levelGrid[levelX][levelY] == nil then
         love.graphics.setColor(127, 127, 127)
-        love.graphics.print("Level doesn't exist. Click to create.", 100, 100)
+        love.graphics.print("Level doesn't exist. Click to create.", 100+x, 100+y)
         return nil
     end
 
     --draw tiles
     love.graphics.setColor(255, 255, 255)
     local l = self.levelGrid[levelX][levelY]
-    local s = self.TILE_SIZE
+    local s = self.TILE_SIZE*scale
     for i=1,self.LEVEL_WIDTH do
         for j=1,self.LEVEL_HEIGHT do
             if l.tileGrid[i][j] == 1 then
-                love.graphics.rectangle("fill", (i-1)*s, (j-1)*s, s, s)
+                love.graphics.rectangle("fill", (i-1)*s+x, (j-1)*s+y, s, s)
             end
         end
     end
@@ -62,14 +61,17 @@ function w:drawLevel(levelX, levelY, showGrid, expandView)
     --draw grid
     love.graphics.setColor(127, 127, 127)
     if showGrid then
-        for i=1,self.LEVEL_HEIGHT do
-            love.graphics.line(0, i*self.TILE_SIZE, self.LEVEL_WIDTH*self.TILE_SIZE, i*self.TILE_SIZE)
+        for i=0,self.LEVEL_HEIGHT do
+            love.graphics.line(x, i*s+y, self.LEVEL_WIDTH*s+x, i*s+y)
         end
 
-        for i=1,self.LEVEL_WIDTH do
-            love.graphics.line(i*self.TILE_SIZE, 0, i*self.TILE_SIZE, self.LEVEL_HEIGHT*self.TILE_SIZE)
+        for i=0,self.LEVEL_WIDTH do
+            love.graphics.line(i*s+x, y, i*s+x, self.LEVEL_HEIGHT*s+y)
         end
     end
+
+    love.graphics.setColor(127, 127, 127)
+    love.graphics.print("("..levelX..", "..levelY..")", 10+x, 10+y)
 end
 
 function w:loadWorld(s)

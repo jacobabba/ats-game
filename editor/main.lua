@@ -53,7 +53,7 @@ function love.update(dt)
 
     if not love.mouse.isDown(1, 2) then disableMouse = false end
 
-    if love.mouse.isDown(1, 2) and not world:levelExists(mouseLevelX, mouseLevelY) and not diableMouse then
+    if love.mouse.isDown(1, 2) and not world:levelExists(mouseLevelX, mouseLevelY) and not disableMouse then
         world:newLevel(mouseLevelX, mouseLevelY)
         disableMouse = true
     elseif love.mouse.isDown(1) and not disableMouse then
@@ -75,19 +75,8 @@ function love.draw()
         world:drawLevel(levelX-1, levelY+1, showGrid, 0,                WINDOW_HEIGHT/1.5, .5)
         world:drawLevel(levelX,   levelY+1, showGrid, WINDOW_WIDTH/3,   WINDOW_HEIGHT/1.5, .5)
         world:drawLevel(levelX+1, levelY+1, showGrid, WINDOW_WIDTH/1.5, WINDOW_HEIGHT/1.5, .5)
-
-        --draw grid between levels
-        love.graphics.setColor(255, 117, 117)
-        love.graphics.line(0, WINDOW_HEIGHT/3, WINDOW_WIDTH, WINDOW_HEIGHT/3)
-        love.graphics.line(0, WINDOW_HEIGHT/1.5, WINDOW_WIDTH, WINDOW_HEIGHT/1.5)
-        love.graphics.line(WINDOW_WIDTH/3, 0, WINDOW_WIDTH/3, WINDOW_HEIGHT)
-        love.graphics.line(WINDOW_WIDTH/1.5, 0, WINDOW_WIDTH/1.5, WINDOW_HEIGHT)
     else
-        --draw level
         world:drawLevel(levelX, levelY, showGrid, WINDOW_WIDTH/6, WINDOW_HEIGHT/6, 1)
-
-        --draw outline
-
     end
     love.graphics.setColor(255, 255, 255)
     love.graphics.print(mouseLevelX.." "..mouseLevelY.." "..mouseTileX.." "..mouseTileY, 10, 10)

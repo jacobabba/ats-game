@@ -40,35 +40,38 @@ end
 
 --if expandview is on, then draw this levels, and all levels bordering it
 function w:drawLevel(levelX, levelY, showGrid, x, y, scale)
+    local s = self.TILE_SIZE*scale --scaled tile size
+
     if self.levelGrid[levelX] == nil or self.levelGrid[levelX][levelY] == nil then
         love.graphics.setColor(127, 127, 127)
         love.graphics.print("Level doesn't exist. Click to create.", 100+x, 100+y)
-        return nil
-    end
+    else
+        --draw tiles
+        local l = self.levelGrid[levelX][levelY]
+        love.graphics.setColor(255, 255, 255)
+        for i=1,self.LEVEL_WIDTH do
+            for j=1,self.LEVEL_HEIGHT do
+                if l.tileGrid[i][j] == 1 then
+                    love.graphics.rectangle("fill", (i-1)*s+x, (j-1)*s+y, s, s)
+                end
+            end
+        end
 
-    --draw tiles
-    love.graphics.setColor(255, 255, 255)
-    local l = self.levelGrid[levelX][levelY]
-    local s = self.TILE_SIZE*scale
-    for i=1,self.LEVEL_WIDTH do
-        for j=1,self.LEVEL_HEIGHT do
-            if l.tileGrid[i][j] == 1 then
-                love.graphics.rectangle("fill", (i-1)*s+x, (j-1)*s+y, s, s)
+        --draw grid
+        love.graphics.setColor(127, 127, 127)
+        if showGrid then
+            for i=0,self.LEVEL_HEIGHT do
+                love.graphics.line(x, i*s+y, self.LEVEL_WIDTH*s+x, i*s+y)
+            end
+
+            for i=0,self.LEVEL_WIDTH do
+                love.graphics.line(i*s+x, y, i*s+x, self.LEVEL_HEIGHT*s+y)
             end
         end
     end
 
-    --draw grid
-    love.graphics.setColor(127, 127, 127)
-    if showGrid then
-        for i=0,self.LEVEL_HEIGHT do
-            love.graphics.line(x, i*s+y, self.LEVEL_WIDTH*s+x, i*s+y)
-        end
-
-        for i=0,self.LEVEL_WIDTH do
-            love.graphics.line(i*s+x, y, i*s+x, self.LEVEL_HEIGHT*s+y)
-        end
-    end
+    love.graphics.setColor(255, 117, 117)
+    love.graphics.rectangle("line", x, y, s*self.LEVEL_WIDTH, s*self.LEVEL_HEIGHT)
 
     love.graphics.setColor(127, 127, 127)
     love.graphics.print("("..levelX..", "..levelY..")", 10+x, 10+y)

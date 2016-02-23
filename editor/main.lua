@@ -4,7 +4,23 @@ function love.load()
     tileType = 1
     expandView = false --if true, show 9 levels on the screen
     showGrid = true
-    mouseHold = false --TODO: make click and drag filling
+    mouse = {
+        x = 0,
+        y = 0,
+        tileX = 0,
+        tileY = 0,
+        levelX = 1,
+        levelY = 1,
+        dragTileX = 1,
+        dragTileY = 1,
+        dragLevelX = 1,
+        dragLevelY = 1,
+        dragLevelSnapX = nil,
+        dragLevelSnapY = nil
+    }
+    editState = "none"
+    rectMode = false
+
     DATAFILE = "DATA.lua"
     timeSinceSwp = 0
 
@@ -14,56 +30,83 @@ function love.load()
     WINDOW_WIDTH = world.TILE_SIZE*world.LEVEL_WIDTH*1.5
     WINDOW_HEIGHT = world.TILE_SIZE*world.LEVEL_HEIGHT*1.5
 
-    love.window.setMode(WINDOW_WIDTH, WINDOW_HEIGHT);
+    love.window.setMode(WINDOW_WIDTH, WINDOW_HEIGHT)
 end
 
 function love.update(dt)
     timeSinceSwp = timeSinceSwp + dt
-    local mouseX = love.mouse.getX()
-    local mouseY = love.mouse.getY()
+    mouse.x = love.mouse.getX()
+    mouse.y = love.mouse.getY()
 
     --compute mouseTile and mouseLevel
     if not expandView then
         --compensate for shifted level
-        mouseX = mouseX - WINDOW_WIDTH/6
-        mouseY = mouseY - WINDOW_HEIGHT/6
+        mouse.x = mouse.x - WINDOW_WIDTH/6
+        mouse.y = mouse.y - WINDOW_HEIGHT/6
 
-        mouseTileX = (mouseX - mouseX % world.TILE_SIZE)/world.TILE_SIZE + 1
-        mouseTileY = (mouseY - mouseY % world.TILE_SIZE)/world.TILE_SIZE + 1
-        mouseLevelX = levelX
-        mouseLevelY = levelY
+        mouse.tileX = (mouse.x - mouse.x % world.TILE_SIZE)/world.TILE_SIZE + 1
+        mouse.tileY = (mouse.y - mouse.y % world.TILE_SIZE)/world.TILE_SIZE + 1
+        mouse.levelX = levelX
+        mouse.levelY = levelY
     else
-        mouseTileX = (mouseX - mouseX % (world.TILE_SIZE*.5))/(world.TILE_SIZE*.5)
-        mouseTileX = mouseTileX % world.LEVEL_WIDTH + 1
+        mouse.tileX = (mouse.x - mouse.x % (world.TILE_SIZE*.5))/(world.TILE_SIZE*.5)
+        mouse.tileX = mouse.tileX % world.LEVEL_WIDTH + 1
 
-        mouseTileY = (mouseY - mouseY % (world.TILE_SIZE*.5))/(world.TILE_SIZE*.5)
-        mouseTileY = mouseTileY % world.LEVEL_HEIGHT + 1
+        mouse.tileY = (mouse.y - mouse.y % (world.TILE_SIZE*.5))/(world.TILE_SIZE*.5)
+        mouse.tileY = mouse.tileY % world.LEVEL_HEIGHT + 1
 
-        mouseLevelX = (mouseX - mouseX % (WINDOW_WIDTH/3))/(WINDOW_WIDTH/3) - 1
-        mouseLevelX = mouseLevelX + levelX
+        mouse.levelX = (mouse.x - mouse.x % (WINDOW_WIDTH/3))/(WINDOW_WIDTH/3) - 1
+        mouse.levelX = mouse.levelX + levelX
 
-        mouseLevelY = (mouseY - mouseY % (WINDOW_HEIGHT/3))/(WINDOW_HEIGHT/3) - 1
-        mouseLevelY = mouseLevelY + levelY
+        mouse.levelY = (mouse.y - mouse.y % (WINDOW_HEIGHT/3))/(WINDOW_HEIGHT/3) - 1
+        mouse.levelY = mouse.levelY + levelY
     end
 
-    --swap file
+    --make swap file
     if timeSinceSwp > 10 then 
         world:saveWorld(DATAFILE..".eswp") 
         timeSinceSwp = 0
     end
 
-    if not love.mouse.isDown(1, 2) then disableMouse = false end
+    --fsm!
+    if editState == "none" then
+        if love.mouse.isDown(1)
+                and not world:levelExists(mouse.levelX, mouse.levelY) then
+            world:newLevel(mouse.levelX, mouse.levelY)
+            editState = "newlevel"
+        elseif love.mouse.isDown(1) and rectMode then
+            editState = "drawrect"
+            mouse.dragTileX = mouse.tileX
+            mouse.dragTileY = mouse.tileY
+            mouse.dragLevelX = mouse.levelX
+            mouse.dragLevelY = mouse.levelY
+        elseif love.mouse.isDown(1) then
+            editState = "drawfree"
+        end
+    elseif editState == "newlevel" then
+        if not love.mouse.isDown(1) then
+            editState = "none"
+        end
+    elseif editState == "drawrect" then
+        --TODO: implement this
+        if love.mouse.isDown(1) then
+            --if not mouse.dragLevelSnapX and mouse.levelX ~= mouse.dragLevelX 
+                    --and not world:levelExists(mouse.levelX, mouse.levelY) then
+                
+        elseif love.keyboard.isDown("escape") then
+            editState = "none"
+        else
+            editState = "none"
+        end
 
-    --if we're not on a tile, disable editing
-    if mouseTileX > world.LEVEL_WIDTH or mouseTileX < 1 or mouseTileY > world.LEVEL_HEIGHT or mouseTileY < 1 then
-        return nil
-    elseif love.mouse.isDown(1, 2) and not world:levelExists(mouseLevelX, mouseLevelY) and not disableMouse then
-        world:newLevel(mouseLevelX, mouseLevelY)
-        disableMouse = true
-    elseif love.mouse.isDown(1) and not disableMouse then
-        world:setTile(mouseLevelX, mouseLevelY, mouseTileX, mouseTileY, tileType)
-    elseif love.mouse.isDown(2) and not disableMouse then
-        world:setTile(mouseLevelX, mouseLevelY, mouseTileX, mouseTileY, 0)
+    elseif editState == "drawfree" then
+        if love.mouse.isDown(1) and mouse.tileX > 0 and mouse.tileY > 0 
+                and mouse.tileX <= world.LEVEL_WIDTH and mouse.tileY <= world.LEVEL_HEIGHT
+                and world:levelExists(mouse.levelX, mouse.levelY) then
+            world:setTile(mouse.levelX, mouse.levelY, mouse.tileX, mouse.tileY, tileType)
+        elseif not love.mouse.isDown(1) then
+            editState = "none"
+        end
     end
 end
 
@@ -84,7 +127,7 @@ function love.draw()
     end
 
     love.graphics.setColor(255, 255, 255)
-    love.graphics.print(mouseLevelX.." "..mouseLevelY.." "..mouseTileX.." "..mouseTileY, 10, 10)
+    love.graphics.print(mouse.levelX.." "..mouse.levelY.." "..mouse.tileX.." "..mouse.tileY, 10, 10)
 end
 
 function love.keypressed(key)
@@ -95,6 +138,9 @@ function love.keypressed(key)
     elseif key == "g" then showGrid = not showGrid
     elseif key == "s" then world:saveWorld(DATAFILE)
     elseif key == "e" then expandView = not expandView
+    elseif key == "r" then rectMode = not rectMode
+    elseif key == "1" then tileType = 1
+    elseif key == "d" then tileType = 0
     end
 end
 

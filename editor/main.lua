@@ -22,6 +22,7 @@ function love.update(dt)
     local mouseX = love.mouse.getX()
     local mouseY = love.mouse.getY()
 
+    --compute mouseTile and mouseLevel
     if not expandView then
         --compensate for shifted level
         mouseX = mouseX - WINDOW_WIDTH/6
@@ -53,7 +54,10 @@ function love.update(dt)
 
     if not love.mouse.isDown(1, 2) then disableMouse = false end
 
-    if love.mouse.isDown(1, 2) and not world:levelExists(mouseLevelX, mouseLevelY) and not disableMouse then
+    --if we're not on a tile, disable editing
+    if mouseTileX > world.LEVEL_WIDTH or mouseTileX < 1 or mouseTileY > world.LEVEL_HEIGHT or mouseTileY < 1 then
+        return nil
+    elseif love.mouse.isDown(1, 2) and not world:levelExists(mouseLevelX, mouseLevelY) and not disableMouse then
         world:newLevel(mouseLevelX, mouseLevelY)
         disableMouse = true
     elseif love.mouse.isDown(1) and not disableMouse then
@@ -64,8 +68,8 @@ function love.update(dt)
 end
 
 function love.draw()
+    --draw level(s)
     if expandView then
-        --draw levels
         world:drawLevel(levelX-1, levelY-1, showGrid, 0,                0,                 .5)
         world:drawLevel(levelX,   levelY-1, showGrid, WINDOW_WIDTH/3,   0,                 .5)
         world:drawLevel(levelX+1, levelY-1, showGrid, WINDOW_WIDTH/1.5, 0,                 .5)
@@ -78,6 +82,7 @@ function love.draw()
     else
         world:drawLevel(levelX, levelY, showGrid, WINDOW_WIDTH/6, WINDOW_HEIGHT/6, 1)
     end
+
     love.graphics.setColor(255, 255, 255)
     love.graphics.print(mouseLevelX.." "..mouseLevelY.." "..mouseTileX.." "..mouseTileY, 10, 10)
 end

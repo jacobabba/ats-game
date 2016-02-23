@@ -58,8 +58,9 @@ function w:drawLevel(levelX, levelY, showGrid, x, y, scale)
         end
 
         --draw grid
-        love.graphics.setColor(127, 127, 127)
         if showGrid then
+            love.graphics.setColor(127, 127, 127)
+
             for i=0,self.LEVEL_HEIGHT do
                 love.graphics.line(x, i*s+y, self.LEVEL_WIDTH*s+x, i*s+y)
             end

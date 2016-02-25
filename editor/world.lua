@@ -18,6 +18,19 @@ function w:levelExists(levelX, levelY)
     end
 end
 
+--returns false if any of the levels in specified range don't exist, else returns true
+function w:levelsExist(levelX1, levelY1, levelX2, levelY2)
+    for i=levelX1,levelX2,(levelX1>levelX2 and -1 or 1) do
+        for j=levelY1,levelY2,(levelY1>levelY2 and -1 or 1) do
+            if self.levelGrid[i] == nil or self.levelGrid[i][j] == nil then
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
 --make a new level with coords x,y in the world
 --uses g as the level's grid
 function w:newLevel(levelX, levelY, g)

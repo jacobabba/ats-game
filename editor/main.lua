@@ -106,6 +106,7 @@ function love.update(dt)
                 for i = mouse.dragPrevLevelX+mod, mouse.levelX, mod do
                     if not mouse.dragLevelSnapX and not world:levelsExist(i, mouse.dragLevelY, i, mouse.dragLevelSnapY or mouse.levelY) then
                         mouse.dragLevelSnapX = i - mod
+                        break
                     end
                 end
 
@@ -122,6 +123,7 @@ function love.update(dt)
                 for i = mouse.dragPrevLevelY+mod, mouse.levelY, mod do
                     if not mouse.dragLevelSnapY and not world:levelsExist(mouse.dragLevelX, i, mouse.dragLevelSnapX or mouse.levelX, i) then
                         mouse.dragLevelSnapY = i - mod
+                        break
                     end
                 end
 
@@ -166,15 +168,18 @@ function love.draw()
         world:drawLevel(levelX, levelY, showGrid, WINDOW_WIDTH/6, WINDOW_HEIGHT/6, 1)
     end
 
-    --draw rect if we're in drawrect state
+    --draw rect preview if we're in drawrect state
     if editState == "drawrect" then
+        --tileShiftX and Y signify how many tiles we're shifting from dragTileX and Y
         local levelShiftX = mouse.levelX - mouse.dragLevelX
         local levelShiftY = mouse.levelY - mouse.dragLevelY
         local tileShiftX = mouse.tileX + world.LEVEL_WIDTH*levelShiftX - mouse.dragTileX
         local tileShiftY = mouse.tileY + world.LEVEL_HEIGHT*levelShiftY - mouse.dragTileY
 
+        --if we're snapped to a level, modify tileShift vars to reflect taht
         if mouse.dragLevelSnapX then
             local snapShiftX = mouse.dragLevelSnapX - mouse.levelX
+
             if snapShiftX > 0 then
                 tileShiftX = tileShiftX + (world.LEVEL_WIDTH - mouse.tileX + 1)
                 tileShiftX = tileShiftX + (world.LEVEL_WIDTH*(snapShiftX-1))
@@ -197,6 +202,7 @@ function love.draw()
 
         local startX, startY, scale
 
+        --find start point of drawing and the scale of tiles
         if expandView then
             startX = WINDOW_WIDTH/3 + (mouse.dragTileX - 1)*world.TILE_SIZE*.5
             startX = startX + (mouse.dragLevelX - levelX)*world.LEVEL_WIDTH*world.TILE_SIZE*.5
@@ -212,6 +218,7 @@ function love.draw()
             scale = 1
         end
 
+        --draw tiles for the rect preview
         for i=0,tileShiftX,(tileShiftX<0 and -1 or 1) do
             for j=0,tileShiftY,(tileShiftY<0 and -1 or 1) do
                 love.graphics.setColor(255, 255, 255)

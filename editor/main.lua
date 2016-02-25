@@ -48,6 +48,13 @@ function love.update(dt)
 
         mouse.tileX = (mouse.x - mouse.x % world.TILE_SIZE)/world.TILE_SIZE + 1
         mouse.tileY = (mouse.y - mouse.y % world.TILE_SIZE)/world.TILE_SIZE + 1
+
+        if mouse.tileX < 1 then mouse.tileX = 1
+        elseif mouse.tileX > world.LEVEL_WIDTH then mouse.tileX = world.LEVEL_WIDTH end
+
+        if mouse.tileY < 1 then mouse.tileY = 1
+        elseif mouse.tileY > world.LEVEL_HEIGHT then mouse.tileY = world.LEVEL_HEIGHT end
+
         mouse.levelX = levelX
         mouse.levelY = levelY
     else
@@ -113,6 +120,22 @@ function love.update(dt)
                 if mouse.dragLevelSnapX == mouse.levelX then
                     mouse.dragLevelSnapX = nil
                 end
+
+                --recompute y to see if we can update the snap
+                mod = (mouse.dragLevelY<mouse.levelY and 1 or -1)
+
+                local noSnap = true
+                for i = mouse.dragLevelY+mod, mouse.levelY, mod do
+                    if not world:levelsExist(mouse.dragLevelX, i, mouse.dragLevelSnapX or mouse.levelX, i) then
+                        mouse.dragLevelSnapY = i - mod
+                        noSnap = false
+                        break
+                    end
+                end
+
+                if noSnap then
+                    mouse.dragLevelSnapY = nil
+                end
             end
 
             if mouse.dragPrevLevelY ~= mouse.levelY then
@@ -129,6 +152,22 @@ function love.update(dt)
 
                 if mouse.dragLevelSnapY == mouse.levelY then
                     mouse.dragLevelSnapY = nil
+                end
+
+                --recompute x to see if we can update the snap
+                mod = (mouse.dragLevelX<mouse.levelX and 1 or -1)
+
+                local noSnap = true
+                for i = mouse.dragLevelX+mod, mouse.levelX, mod do
+                    if not world:levelsExist(i, mouse.dragLevelY, i, mouse.dragLevelSnapY or mouse.levelY) then
+                        mouse.dragLevelSnapX = i - mod
+                        noSnap = false
+                        break
+                    end
+                end
+
+                if noSnap then
+                    mouse.dragLevelSnapX = nil
                 end
             end
 
@@ -225,9 +264,11 @@ function love.draw()
                 love.graphics.rectangle("fill", i*world.TILE_SIZE*scale + startX, j*world.TILE_SIZE*scale + startY, 
                                         world.TILE_SIZE*scale, world.TILE_SIZE*scale)
 
-                love.graphics.setColor(127, 127, 127)
-                love.graphics.rectangle("line", i*world.TILE_SIZE*scale + startX, j*world.TILE_SIZE*scale + startY, 
-                                        world.TILE_SIZE*scale, world.TILE_SIZE*scale)
+                if showGrid then
+                    love.graphics.setColor(127, 127, 127)
+                    love.graphics.rectangle("line", i*world.TILE_SIZE*scale + startX, j*world.TILE_SIZE*scale + startY, 
+                                            world.TILE_SIZE*scale, world.TILE_SIZE*scale)
+                end
             end
         end
     end
@@ -244,7 +285,7 @@ function love.keypressed(key)
     elseif key == "right" then levelX = levelX + 1
     elseif key == "g" then showGrid = not showGrid
     elseif key == "s" then world:saveWorld(DATAFILE)
-    elseif key == "e" then expandView = not expandView
+    elseif key == "e" and editState ~= "drawrect" then expandView = not expandView
     elseif key == "r" then rectMode = not rectMode
     elseif key == "1" then tileType = 1
     elseif key == "d" then tileType = 0

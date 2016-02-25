@@ -78,6 +78,7 @@ function love.update(dt)
     end
 
     --editing fsm
+    ----------------------------------------------
     if editState == "none" then
         if love.mouse.isDown(1)
                 and not world:levelExists(mouse.levelX, mouse.levelY) then
@@ -104,7 +105,7 @@ function love.update(dt)
     ----------------------------------------------
     elseif editState == "drawrect" then
         if love.mouse.isDown(1) then
-            --check if we need to snap to something or unsnap
+            --check if we need to snap to something or unsnap (x)
             if mouse.dragPrevLevelX ~= mouse.levelX then
                 --mod signifies whether we are going to a bigger level than before or a smaller one
                 local mod = (mouse.dragPrevLevelX<mouse.levelX and 1 or -1)
@@ -138,6 +139,7 @@ function love.update(dt)
                 end
             end
 
+            --check if we need to snap to something or unsnap (y)
             if mouse.dragPrevLevelY ~= mouse.levelY then
                 --mod signifies whether we are going to a bigger level than before or a smaller one
                 local mod = (mouse.dragPrevLevelY<mouse.levelY and 1 or -1)
@@ -188,6 +190,7 @@ function love.update(dt)
         elseif not love.mouse.isDown(1) then
             editState = "none"
         end
+    ----------------------------------------------
     end
 end
 

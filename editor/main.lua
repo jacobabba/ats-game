@@ -18,7 +18,11 @@ function love.load()
         dragLevelSnapX = nil,
         dragLevelSnapY = nil,
         dragPrevLevelX = 1,
-        dragPrevLevelY = 1
+        dragPrevLevelY = 1,
+        dragTileShiftX = nil,
+        dragTileShiftY = nil,
+        dragLevelShiftX = nil,
+        dragLevelShiftY = nil
     }
     editState = "none"
     rectMode = false
@@ -33,6 +37,8 @@ function love.load()
     WINDOW_HEIGHT = world.TILE_SIZE*world.LEVEL_HEIGHT*1.5
 
     love.window.setMode(WINDOW_WIDTH, WINDOW_HEIGHT)
+
+    rect = {update, draw = require("rect_mode")}
 end
 
 function love.update(dt)
@@ -94,6 +100,10 @@ function love.update(dt)
             mouse.dragPrevLevelY = mouse.levelY
             mouse.dragLevelSnapX = nil
             mouse.dragLevelSnapY = nil
+            mouse.dragLevelShiftX = nil
+            mouse.dragLevelShiftY = nil
+            mouse.dragTileShiftX = nil
+            mouse.dragTileShiftY = nil
         elseif love.mouse.isDown(1) then
             editState = "drawfree"
         end
@@ -104,83 +114,7 @@ function love.update(dt)
         end
     ----------------------------------------------
     elseif editState == "drawrect" then
-        if love.mouse.isDown(1) then
-            --check if we need to snap to something or unsnap (x)
-            if mouse.dragPrevLevelX ~= mouse.levelX then
-                --mod signifies whether we are going to a bigger level than before or a smaller one
-                local mod = (mouse.dragPrevLevelX<mouse.levelX and 1 or -1)
-
-                --check if there are any nonexistant levels inhibiting our movement
-                for i = mouse.dragPrevLevelX+mod, mouse.levelX, mod do
-                    if not mouse.dragLevelSnapX and not world:levelsExist(i, mouse.dragLevelY, i, mouse.dragLevelSnapY or mouse.levelY) then
-                        mouse.dragLevelSnapX = i - mod
-                        break
-                    end
-                end
-
-                if mouse.dragLevelSnapX == mouse.levelX then
-                    mouse.dragLevelSnapX = nil
-                end
-
-                --recompute y to see if we can update the snap
-                mod = (mouse.dragLevelY<mouse.levelY and 1 or -1)
-
-                local noSnap = true
-                for i = mouse.dragLevelY+mod, mouse.levelY, mod do
-                    if not world:levelsExist(mouse.dragLevelX, i, mouse.dragLevelSnapX or mouse.levelX, i) then
-                        mouse.dragLevelSnapY = i - mod
-                        noSnap = false
-                        break
-                    end
-                end
-
-                if noSnap then
-                    mouse.dragLevelSnapY = nil
-                end
-            end
-
-            --check if we need to snap to something or unsnap (y)
-            if mouse.dragPrevLevelY ~= mouse.levelY then
-                --mod signifies whether we are going to a bigger level than before or a smaller one
-                local mod = (mouse.dragPrevLevelY<mouse.levelY and 1 or -1)
-
-                --check if there are any nonexistant levels inhibiting our movement
-                for i = mouse.dragPrevLevelY+mod, mouse.levelY, mod do
-                    if not mouse.dragLevelSnapY and not world:levelsExist(mouse.dragLevelX, i, mouse.dragLevelSnapX or mouse.levelX, i) then
-                        mouse.dragLevelSnapY = i - mod
-                        break
-                    end
-                end
-
-                if mouse.dragLevelSnapY == mouse.levelY then
-                    mouse.dragLevelSnapY = nil
-                end
-
-                --recompute x to see if we can update the snap
-                mod = (mouse.dragLevelX<mouse.levelX and 1 or -1)
-
-                local noSnap = true
-                for i = mouse.dragLevelX+mod, mouse.levelX, mod do
-                    if not world:levelsExist(i, mouse.dragLevelY, i, mouse.dragLevelSnapY or mouse.levelY) then
-                        mouse.dragLevelSnapX = i - mod
-                        noSnap = false
-                        break
-                    end
-                end
-
-                if noSnap then
-                    mouse.dragLevelSnapX = nil
-                end
-            end
-
-            mouse.dragPrevLevelX = mouse.levelX
-            mouse.dragPrevLevelY = mouse.levelY
-        elseif love.keyboard.isDown("escape") then
-            editState = "none"
-        else
-            editState = "none"
-            --TODO: write tiles to world
-        end
+        rect.update()
     ----------------------------------------------
     elseif editState == "drawfree" then
         if love.mouse.isDown(1) and mouse.tileX > 0 and mouse.tileY > 0 
@@ -212,68 +146,7 @@ function love.draw()
 
     --draw rect preview if we're in drawrect state
     if editState == "drawrect" then
-        --tileShiftX and Y signify how many tiles we're shifting from dragTileX and Y
-        local levelShiftX = mouse.levelX - mouse.dragLevelX
-        local levelShiftY = mouse.levelY - mouse.dragLevelY
-        local tileShiftX = mouse.tileX + world.LEVEL_WIDTH*levelShiftX - mouse.dragTileX
-        local tileShiftY = mouse.tileY + world.LEVEL_HEIGHT*levelShiftY - mouse.dragTileY
-
-        --if we're snapped to a level, modify tileShift vars to reflect taht
-        if mouse.dragLevelSnapX then
-            local snapShiftX = mouse.dragLevelSnapX - mouse.levelX
-
-            if snapShiftX > 0 then
-                tileShiftX = tileShiftX + (world.LEVEL_WIDTH - mouse.tileX + 1)
-                tileShiftX = tileShiftX + (world.LEVEL_WIDTH*(snapShiftX-1))
-            else
-                tileShiftX = tileShiftX - (mouse.tileX)
-                tileShiftX = tileShiftX + (world.LEVEL_WIDTH*(snapShiftX+1))
-            end
-        end
-
-        if mouse.dragLevelSnapY then
-            local snapShiftY = mouse.dragLevelSnapY - mouse.levelY
-            if snapShiftY > 0 then
-                tileShiftY = tileShiftY + (world.LEVEL_HEIGHT - mouse.tileY + 1)
-                tileShiftY = tileShiftY + (world.LEVEL_HEIGHT*(snapShiftY-1))
-            else
-                tileShiftY = tileShiftY - (mouse.tileY)
-                tileShiftY = tileShiftY + (world.LEVEL_HEIGHT*(snapShiftY+1))
-            end
-        end
-
-        local startX, startY, scale
-
-        --find start point of drawing and the scale of tiles
-        if expandView then
-            startX = WINDOW_WIDTH/3 + (mouse.dragTileX - 1)*world.TILE_SIZE*.5
-            startX = startX + (mouse.dragLevelX - levelX)*world.LEVEL_WIDTH*world.TILE_SIZE*.5
-
-            startY = WINDOW_HEIGHT/3 + (mouse.dragTileY - 1)*world.TILE_SIZE*.5
-            startY = startY + (mouse.dragLevelY - levelY)*world.LEVEL_HEIGHT*world.TILE_SIZE*.5
-
-            scale = .5
-        else
-            startX = WINDOW_WIDTH/6 + (mouse.dragTileX - 1)*world.TILE_SIZE
-            startY = WINDOW_HEIGHT/6 + (mouse.dragTileY - 1)*world.TILE_SIZE
-
-            scale = 1
-        end
-
-        --draw tiles for the rect preview
-        for i=0,tileShiftX,(tileShiftX<0 and -1 or 1) do
-            for j=0,tileShiftY,(tileShiftY<0 and -1 or 1) do
-                love.graphics.setColor(255, 255, 255)
-                love.graphics.rectangle("fill", i*world.TILE_SIZE*scale + startX, j*world.TILE_SIZE*scale + startY, 
-                                        world.TILE_SIZE*scale, world.TILE_SIZE*scale)
-
-                if showGrid then
-                    love.graphics.setColor(127, 127, 127)
-                    love.graphics.rectangle("line", i*world.TILE_SIZE*scale + startX, j*world.TILE_SIZE*scale + startY, 
-                                            world.TILE_SIZE*scale, world.TILE_SIZE*scale)
-                end
-            end
-        end
+        rect.draw()
     end
 
     --show info about the tile/level the mouse is on

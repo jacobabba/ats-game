@@ -38,7 +38,7 @@ function love.load()
 
     love.window.setMode(WINDOW_WIDTH, WINDOW_HEIGHT)
 
-    rect = {update, draw = require("rect_mode")}
+    rect = require("rect_mode")
 end
 
 function love.update(dt)
@@ -87,7 +87,7 @@ function love.update(dt)
     ----------------------------------------------
     if editState == "none" then
         if love.mouse.isDown(1)
-                and not world:levelExists(mouse.levelX, mouse.levelY) then
+        and not world:levelExists(mouse.levelX, mouse.levelY) then
             world:newLevel(mouse.levelX, mouse.levelY)
             editState = "newlevel"
         elseif love.mouse.isDown(1) and rectMode then
@@ -114,7 +114,7 @@ function love.update(dt)
         end
     ----------------------------------------------
     elseif editState == "drawrect" then
-        rect.update()
+        rect.update(mouse)
     ----------------------------------------------
     elseif editState == "drawfree" then
         if love.mouse.isDown(1) and mouse.tileX > 0 and mouse.tileY > 0 
@@ -146,7 +146,7 @@ function love.draw()
 
     --draw rect preview if we're in drawrect state
     if editState == "drawrect" then
-        rect.draw()
+        rect.draw(mouse)
     end
 
     --show info about the tile/level the mouse is on
@@ -155,10 +155,10 @@ function love.draw()
 end
 
 function love.keypressed(key)
-    if key == "up" then levelY = levelY - 1
-    elseif key == "down" then levelY = levelY + 1
-    elseif key == "left" then levelX = levelX - 1
-    elseif key == "right" then levelX = levelX + 1
+    if key == "up" and editState ~= "drawrect" then levelY = levelY - 1
+    elseif key == "down" and editState ~= "drawrect" then levelY = levelY + 1
+    elseif key == "left" and editState ~= "drawrect" then levelX = levelX - 1
+    elseif key == "right" and editState ~= "drawrect" then levelX = levelX + 1
     elseif key == "g" then showGrid = not showGrid
     elseif key == "s" then world:saveWorld(DATAFILE)
     elseif key == "e" and editState ~= "drawrect" then expandView = not expandView

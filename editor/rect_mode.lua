@@ -171,14 +171,18 @@ do
         if mouse.dragTileShiftX and mouse.dragTileShiftY and mouse.dragLevelShiftX and mouse.dragLevelShiftY then
             for i=0,mouse.dragTileShiftX,(mouse.dragTileShiftX<0 and -1 or 1) do
                 for j=0,mouse.dragTileShiftY,(mouse.dragTileShiftY<0 and -1 or 1) do
-                    love.graphics.setColor(255, 255, 255)
-                    love.graphics.rectangle("fill", i*world.TILE_SIZE*scale + startX, j*world.TILE_SIZE*scale + startY, 
-                                            world.TILE_SIZE*scale, world.TILE_SIZE*scale)
+                    if tileType == 1 then
+                        love.graphics.setColor(255, 255, 255)
+                    elseif tileType == 0 then
+                        love.graphics.setColor(0, 0, 0)
+                    end
+                    love.graphics.rectangle("fill", i*world.TILE_SIZE*scale + startX, 
+                            j*world.TILE_SIZE*scale + startY, world.TILE_SIZE*scale, world.TILE_SIZE*scale)
     
                     if showGrid then
                         love.graphics.setColor(127, 127, 127)
-                        love.graphics.rectangle("line", i*world.TILE_SIZE*scale + startX, j*world.TILE_SIZE*scale + startY, 
-                                                world.TILE_SIZE*scale, world.TILE_SIZE*scale)
+                        love.graphics.rectangle("line", i*world.TILE_SIZE*scale + startX, 
+                                j*world.TILE_SIZE*scale + startY, world.TILE_SIZE*scale, world.TILE_SIZE*scale)
                     end
                 end
             end

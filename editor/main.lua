@@ -22,10 +22,11 @@ function love.load()
         dragTileShiftX = nil,
         dragTileShiftY = nil,
         dragLevelShiftX = nil,
-        dragLevelShiftY = nil
+        dragLevelShiftY = nil,
+        holdTime = 0
     }
     editState = "none"
-    rectMode = false
+    editMode = "free"
 
     DATAFILE = "DATA.lua"
     timeSinceSwp = 0
@@ -90,7 +91,7 @@ function love.update(dt)
         and not world:levelExists(mouse.levelX, mouse.levelY) then
             world:newLevel(mouse.levelX, mouse.levelY)
             editState = "newlevel"
-        elseif love.mouse.isDown(1) and rectMode then
+        elseif love.mouse.isDown(1) and editMode == "rect" then
             editState = "drawrect"
             mouse.dragTileX = mouse.tileX
             mouse.dragTileY = mouse.tileY
@@ -104,6 +105,11 @@ function love.update(dt)
             mouse.dragLevelShiftY = nil
             mouse.dragTileShiftX = nil
             mouse.dragTileShiftY = nil
+        elseif love.mouse.isDown(1) and editMode == "deletelevel" then
+            editState = "deletelevel"
+            mouse.holdTime = 0
+            mouse.dragLevelX = mouse.levelX
+            mouse.dragLevelY = mouse.levelY
         elseif love.mouse.isDown(1) then
             editState = "drawfree"
         end
@@ -125,6 +131,18 @@ function love.update(dt)
             editState = "none"
         end
     ----------------------------------------------
+    elseif editState == "deletelevel" then
+        --if we hold the mouse on a level for three seconds, delete it
+        if love.mouse.isDown(1) and mouse.levelX == mouse.dragLevelX and mouse.levelY == mouse.dragLevelY then
+            mouse.holdTime = mouse.holdTime + dt
+        else
+            mouse.holdTime = 0
+            editState = "none"
+        end
+
+        if mouse.holdTime > 3 then
+            world:deleteLevel(mouse.dragLevelX, mouse.dragLevelY)
+        end
     end
 end
 
@@ -149,9 +167,20 @@ function love.draw()
         rect.draw(mouse)
     end
 
-    --show info about the tile/level the mouse is on
-    love.graphics.setColor(255, 255, 255)
-    love.graphics.print(mouse.levelX.." "..mouse.levelY.." "..mouse.tileX.." "..mouse.tileY, 10, 10)
+    --show info about the tile/level the mouse is on and which tile we're drawing
+    love.graphics.setColor(255, 117, 117)
+    love.graphics.print("("..mouse.levelX..", "..mouse.levelY..") - ("..mouse.tileX..", "..mouse.tileY
+            ..") - "..(editMode=="free" and "f" or editMode=="rect" and "r" or "x").." - "..tileType, 10, WINDOW_HEIGHT-20)
+
+    --show controls
+    if not expandView then
+        love.graphics.print("Controls:\n".."Arrow keys - move levels\n"
+                            .."g - toggle grid\n".."s - save changes\n"
+                            .."e - toggle expanded view\n\n".."Editing modes:\n"
+                            .."r - rect mode "..(editMode=="rect" and "(on)" or "(off)")
+                            .."\nf - free mode "..(editMode=="free" and "(on)" or "(off)")
+                            .."\nx - delete level "..(editMode=="deletelevel" and "(on)" or "(off)"), 10, 50)
+    end
 end
 
 function love.keypressed(key)
@@ -162,7 +191,9 @@ function love.keypressed(key)
     elseif key == "g" then showGrid = not showGrid
     elseif key == "s" then world:saveWorld(DATAFILE)
     elseif key == "e" and editState ~= "drawrect" then expandView = not expandView
-    elseif key == "r" then rectMode = not rectMode
+    elseif key == "r" then editMode = "rect"
+    elseif key == "f" then editMode = "free"
+    elseif key == "x" then editMode = "deletelevel"
     elseif key == "1" then tileType = 1
     elseif key == "d" then tileType = 0
     end

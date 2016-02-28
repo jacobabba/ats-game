@@ -51,6 +51,13 @@ function w:newLevel(levelX, levelY, g)
     self.levelGrid[levelX][levelY] = l
 end
 
+--delete a level if it exists
+function w:deleteLevel(levelX, levelY)
+    if self.levelGrid[levelX] and self.levelGrid[levelX][levelY] then
+        self.levelGrid[levelX][levelY] = nil
+    end
+end
+
 --if expandview is on, then draw this levels, and all levels bordering it
 function w:drawLevel(levelX, levelY, showGrid, x, y, scale)
     local s = self.TILE_SIZE*scale --scaled tile size
@@ -87,7 +94,6 @@ function w:drawLevel(levelX, levelY, showGrid, x, y, scale)
     love.graphics.setColor(255, 117, 117)
     love.graphics.rectangle("line", x, y, s*self.LEVEL_WIDTH, s*self.LEVEL_HEIGHT)
 
-    love.graphics.setColor(127, 127, 127)
     love.graphics.print("("..levelX..", "..levelY..")", 10+x, 10+y)
 end
 

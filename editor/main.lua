@@ -168,12 +168,23 @@ function love.draw()
     end
 
     --show info about the tile/level the mouse is on and which tile we're drawing
-    love.graphics.setColor(255, 117, 117)
+    --move out of the way if we're drawing in that area
+    local infoXPos
+    if expandView and mouse.x < 200 and mouse.y > WINDOW_HEIGHT-30 then
+        infoXPos = WINDOW_WIDTH-200
+    else
+        infoXPos = 10
+    end
+        
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.rectangle("fill", infoXPos-10, WINDOW_HEIGHT-25, 200, 20)
+    love.graphics.setColor(255, 255, 255)
     love.graphics.print("("..mouse.levelX..", "..mouse.levelY..") - ("..mouse.tileX..", "..mouse.tileY
-            ..") - "..(editMode=="free" and "f" or editMode=="rect" and "r" or "x").." - "..tileType, 10, WINDOW_HEIGHT-20)
+            ..") - "..(editMode=="free" and "f" or editMode=="rect" and "r" or "x").." - "..tileType, infoXPos, WINDOW_HEIGHT-20)
 
-    --show controls
+    --show controls info
     if not expandView then
+        love.graphics.setColor(255, 255, 255)
         love.graphics.print("Controls:\n".."Arrow keys - move levels\n"
                             .."g - toggle grid\n".."s - save changes\n"
                             .."e - toggle expanded view\n\n".."Editing modes:\n"

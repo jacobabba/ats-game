@@ -30,14 +30,14 @@ function love.load()
         holdTime = 0
     }
 
-    editState = "none" --the current editing state we're in
+    editState = "none" --the current editing state we're in:
                        --"none" - not currently editing
                        --"newlevel" - creating a new level
                        --"drawrect" - drawing a rectangle of tiles
                        --"drawfree" - freely drawing tiles
                        --"deletelevel" - deleting a level
 
-    editMode = "free" --free: create tiles individually
+    editMode = "free" --free: create tiles individually:
                       --rect: draw rectangles of tiles
                       --deletelevel: delete levels
 

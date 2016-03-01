@@ -71,8 +71,15 @@ function w:drawLevel(levelX, levelY, showGrid, x, y, scale)
         love.graphics.setColor(255, 255, 255)
         for i=1,self.LEVEL_WIDTH do
             for j=1,self.LEVEL_HEIGHT do
-                if l.tileGrid[i][j] == 1 then
+                local t = TILE_TYPES[l.tileGrid[i][j]]
+
+                if t and t.isTile then
+                    love.graphics.setColor(t.tileColorR, t.tileColorG, t.tileColorB)
                     love.graphics.rectangle("fill", (i-1)*s+x, (j-1)*s+y, s, s)
+                end
+
+                if t and t.isLine then
+                    --TODO: implement
                 end
             end
         end

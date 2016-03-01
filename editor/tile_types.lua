@@ -5,7 +5,7 @@ do
     --isLIne specifies whether there's a line through that tile
 
     _t[0] = {
-        name = "Blank"
+        name = "Blank",
         tileColorR = 0,
         tileColorG = 0,
         tileColorB = 0,
@@ -14,7 +14,7 @@ do
     }
 
     _t[1] = {
-        name = "Regular Tile"
+        name = "Regular Tile",
         tileColorR = 255,
         tileColorG = 255,
         tileColorB = 255,

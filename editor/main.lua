@@ -1,9 +1,13 @@
 function love.load()
     levelX = 1
     levelY = 1
+
+    TILE_TYPES = require("tile_types")
     tileType = 1
+
     expandView = false --if true, show 9 levels on the screen
     showGrid = true
+
     mouse = {
         x = 0,
         y = 0,
@@ -25,8 +29,17 @@ function love.load()
         dragLevelShiftY = nil,
         holdTime = 0
     }
-    editState = "none"
-    editMode = "free"
+
+    editState = "none" --the current editing state we're in
+                       --"none" - not currently editing
+                       --"newlevel" - creating a new level
+                       --"drawrect" - drawing a rectangle of tiles
+                       --"drawfree" - freely drawing tiles
+                       --"deletelevel" - deleting a level
+
+    editMode = "free" --free: create tiles individually
+                      --rect: draw rectangles of tiles
+                      --deletelevel: delete levels
 
     DATAFILE = "DATA.lua"
     timeSinceSwp = 0

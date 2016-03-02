@@ -4,6 +4,7 @@ function love.load()
 
     TILE_TYPES = require("tile_types")
     tileType = 1
+    tileSelect = ""
 
     expandView = false --if true, show 9 levels on the screen
     showGrid = true
@@ -146,7 +147,8 @@ function love.update(dt)
     ----------------------------------------------
     elseif editState == "deletelevel" then
         --if we hold the mouse on a level for three seconds, delete it
-        if love.mouse.isDown(1) and mouse.levelX == mouse.dragLevelX and mouse.levelY == mouse.dragLevelY then
+        if love.mouse.isDown(1) and mouse.levelX == mouse.dragLevelX 
+            and mouse.levelY == mouse.dragLevelY then
             mouse.holdTime = mouse.holdTime + dt
         else
             mouse.holdTime = 0
@@ -180,8 +182,16 @@ function love.draw()
         rect.draw(mouse)
     end
 
-    --show info about the tile/level the mouse is on and which tile we're drawing
-    --move out of the way if we're drawing in that area
+    --show tile selection
+    if tileSelect ~= "" then
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.rectangle("fill", 0, 0, 50, 20)
+        love.graphics.setColor(255, 117, 117)
+        love.graphics.print(tileSelect, 0, 0)
+    end
+
+    --show info box
+    --move out of the way if the mouse is in that area
     local infoXPos
     if expandView and mouse.x < 200 and mouse.y > WINDOW_HEIGHT-30 then
         infoXPos = WINDOW_WIDTH-200
@@ -192,8 +202,10 @@ function love.draw()
     love.graphics.setColor(0, 0, 0)
     love.graphics.rectangle("fill", infoXPos-10, WINDOW_HEIGHT-25, 200, 20)
     love.graphics.setColor(255, 255, 255)
-    love.graphics.print("("..mouse.levelX..", "..mouse.levelY..") - ("..mouse.tileX..", "..mouse.tileY
-            ..") - "..(editMode=="free" and "f" or editMode=="rect" and "r" or "x").." - "..tileType, infoXPos, WINDOW_HEIGHT-20)
+    love.graphics.print("("..mouse.levelX..", "..mouse.levelY
+                        ..") - ("..mouse.tileX..", "..mouse.tileY..") - "
+                        ..(editMode=="free" and "f" or editMode=="rect" and "r" or "x")
+                        .." - "..tileType, infoXPos, WINDOW_HEIGHT-20)
 
     --show controls info
     if not expandView then
@@ -218,8 +230,21 @@ function love.keypressed(key)
     elseif key == "r" then editMode = "rect"
     elseif key == "f" then editMode = "free"
     elseif key == "x" then editMode = "deletelevel"
-    elseif key == "1" then tileType = 1
-    elseif key == "d" then tileType = 0
+    elseif (key == "0" or key == "1" or key == "2" or key == "3" or key == "4" 
+        or key == "5" or key == "6" or key == "7" or key == "8" or key == "9")
+        and string.len(tileSelect) < 3 then
+        tileSelect = tileSelect .. key
+    elseif key == "t" and tileSelect ~= "" then
+        local n = tonumber(tileSelect)
+
+        if TILE_TYPES[n] then
+            tileType = n
+            tileSelect = ""
+        else
+            tileSelect = ""
+        end
+    elseif key == "escape" then
+        tileSelect = ""
     end
 end
 

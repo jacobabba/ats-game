@@ -207,7 +207,7 @@ function love.draw()
                         ..(editMode=="free" and "f" or editMode=="rect" and "r" or "x")
                         .." - "..tileType, infoXPos, WINDOW_HEIGHT-20)
 
-    --show controls info
+    --show controls info/overlay
     if not expandView then
         love.graphics.setColor(255, 255, 255)
         love.graphics.print("Controls:\n".."Arrow keys - move levels\n"
@@ -216,6 +216,15 @@ function love.draw()
                             .."r - rect mode "..(editMode=="rect" and "(on)" or "(off)")
                             .."\nf - free mode "..(editMode=="free" and "(on)" or "(off)")
                             .."\nx - delete level "..(editMode=="deletelevel" and "(on)" or "(off)"), 10, 50)
+
+        --show tile types available
+        for k, v in pairs(TILE_TYPES) do
+            love.graphics.printf("Available tiles: ", 
+                                 WINDOW_WIDTH-WINDOW_WIDTH/6, 50, WINDOW_WIDTH/6, "right")
+
+            love.graphics.printf((tileType==k and "*" or "")..v.name.." - "..k, 
+                                 WINDOW_WIDTH-WINDOW_WIDTH/6, 65+k*15, WINDOW_WIDTH/6, "right")
+        end
     end
 end
 

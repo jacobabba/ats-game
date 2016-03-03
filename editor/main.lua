@@ -1,3 +1,9 @@
+-----------------------------------------------------------------
+-- editor/main.lua
+-- Contains main love2d callbacks for the level editor.
+-- Author: Jacob Abba
+-----------------------------------------------------------------
+
 function love.load()
     levelX = 1
     levelY = 1
@@ -16,21 +22,12 @@ function love.load()
         tileY = 0,
         levelX = 1,
         levelY = 1,
-        dragTileX = 1,
-        dragTileY = 1,
-        dragLevelX = 1,
-        dragLevelY = 1,
-        dragLevelSnapX = nil,
-        dragLevelSnapY = nil,
-        dragPrevLevelX = 1,
-        dragPrevLevelY = 1,
-        dragTileShiftX = nil,
-        dragTileShiftY = nil,
-        dragLevelShiftX = nil,
-        dragLevelShiftY = nil,
-        holdTime = 0
+        holdTime = 0,
+        holdLevelX = nil,
+        holdLevelY = nil
     }
 
+    --current state of editing, i.e. what the user is doing now
     editState = "none" --the current editing state we're in:
                        --"none" - not currently editing
                        --"newlevel" - creating a new level
@@ -38,6 +35,7 @@ function love.load()
                        --"drawfree" - freely drawing tiles
                        --"deletelevel" - deleting a level
 
+    --mode the user is in, determines where editState will go depending on input
     editMode = "free" --free: create tiles individually:
                       --rect: draw rectangles of tiles
                       --deletelevel: delete levels
@@ -53,7 +51,7 @@ function love.load()
 
     love.window.setMode(WINDOW_WIDTH, WINDOW_HEIGHT)
 
-    rect = require("rect_mode")
+    rect = require("rect")
 end
 
 function love.update(dt)
@@ -107,23 +105,12 @@ function love.update(dt)
             editState = "newlevel"
         elseif love.mouse.isDown(1) and editMode == "rect" then
             editState = "drawrect"
-            mouse.dragTileX = mouse.tileX
-            mouse.dragTileY = mouse.tileY
-            mouse.dragLevelX = mouse.levelX
-            mouse.dragLevelY = mouse.levelY
-            mouse.dragPrevLevelX = mouse.levelX
-            mouse.dragPrevLevelY = mouse.levelY
-            mouse.dragLevelSnapX = nil
-            mouse.dragLevelSnapY = nil
-            mouse.dragLevelShiftX = nil
-            mouse.dragLevelShiftY = nil
-            mouse.dragTileShiftX = nil
-            mouse.dragTileShiftY = nil
+            rect:reset(mouse.tileX, mouse.tileY, mouse.levelX, mouse.levelY)
         elseif love.mouse.isDown(1) and editMode == "deletelevel" then
             editState = "deletelevel"
             mouse.holdTime = 0
-            mouse.dragLevelX = mouse.levelX
-            mouse.dragLevelY = mouse.levelY
+            mouse.holdLevelX = mouse.levelX
+            mouse.holdLevelY = mouse.levelY
         elseif love.mouse.isDown(1) then
             editState = "drawfree"
         end
@@ -134,12 +121,19 @@ function love.update(dt)
         end
     ----------------------------------------------
     elseif editState == "drawrect" then
-        rect.update(mouse)
+        if love.mouse.isDown(1) then
+            rect:update(mouse, world)
+        elseif love.keyboard.isDown("escape") then
+            editState = "none"
+        else
+            rect:write(world)
+            editState = "none"
+        end
     ----------------------------------------------
     elseif editState == "drawfree" then
         if love.mouse.isDown(1) and mouse.tileX > 0 and mouse.tileY > 0 
-                and mouse.tileX <= world.LEVEL_WIDTH and mouse.tileY <= world.LEVEL_HEIGHT
-                and world:levelExists(mouse.levelX, mouse.levelY) then
+        and mouse.tileX <= world.LEVEL_WIDTH and mouse.tileY <= world.LEVEL_HEIGHT
+        and world:levelExists(mouse.levelX, mouse.levelY) then
             world:setTile(mouse.levelX, mouse.levelY, mouse.tileX, mouse.tileY, tileType)
         elseif not love.mouse.isDown(1) then
             editState = "none"
@@ -147,16 +141,16 @@ function love.update(dt)
     ----------------------------------------------
     elseif editState == "deletelevel" then
         --if we hold the mouse on a level for three seconds, delete it
-        if love.mouse.isDown(1) and mouse.levelX == mouse.dragLevelX 
-            and mouse.levelY == mouse.dragLevelY then
+        if love.mouse.isDown(1) and mouse.levelX == mouse.holdLevelX 
+        and mouse.levelY == mouse.holdLevelY then
             mouse.holdTime = mouse.holdTime + dt
         else
             mouse.holdTime = 0
             editState = "none"
         end
 
-        if mouse.holdTime > 3 then
-            world:deleteLevel(mouse.dragLevelX, mouse.dragLevelY)
+        if mouse.holdTime > 1.5 then
+            world:deleteLevel(mouse.holdLevelX, mouse.holdLevelY)
         end
     end
 end
@@ -179,7 +173,7 @@ function love.draw()
 
     --draw rect preview if we're in drawrect state
     if editState == "drawrect" then
-        rect.draw(mouse)
+        rect:draw(mouse, world)
     end
 
     --show tile selection
@@ -215,7 +209,8 @@ function love.draw()
                             .."e - toggle expanded view\n\n".."Editing modes:\n"
                             .."r - rect mode "..(editMode=="rect" and "(on)" or "(off)")
                             .."\nf - free mode "..(editMode=="free" and "(on)" or "(off)")
-                            .."\nx - delete level "..(editMode=="deletelevel" and "(on)" or "(off)"), 10, 50)
+                            .."\nx - delete level "
+                            ..(editMode=="deletelevel" and "(on)" or "(off)"), 10, 50)
 
         --show tile types available
         for k, v in pairs(TILE_TYPES) do
@@ -240,8 +235,8 @@ function love.keypressed(key)
     elseif key == "f" then editMode = "free"
     elseif key == "x" then editMode = "deletelevel"
     elseif (key == "0" or key == "1" or key == "2" or key == "3" or key == "4" 
-        or key == "5" or key == "6" or key == "7" or key == "8" or key == "9")
-        and string.len(tileSelect) < 3 then
+    or key == "5" or key == "6" or key == "7" or key == "8" or key == "9")
+    and string.len(tileSelect) < 3 then
         tileSelect = tileSelect .. key
     elseif key == "t" and tileSelect ~= "" then
         local n = tonumber(tileSelect)

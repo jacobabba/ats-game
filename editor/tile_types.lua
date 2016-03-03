@@ -1,3 +1,9 @@
+-----------------------------------------------------------------
+-- editor/tile_types.lua
+-- Contains the tile structure with all of the possible tiles
+-- Author: Jacob Abba
+-----------------------------------------------------------------
+
 do
     local _t = {}
 

@@ -59,7 +59,7 @@ function love.update(dt)
     mouse.x = love.mouse.getX()
     mouse.y = love.mouse.getY()
 
-    --compute mouseTile and mouseLevel
+    --find which tile and level the mouse is on
     if not expandView then
         --compensate for shifted level
         mouse.x = mouse.x - WINDOW_WIDTH/6
@@ -90,7 +90,7 @@ function love.update(dt)
         mouse.levelY = mouse.levelY + levelY
     end
 
-    --make swap file
+    --make swap file, handy if the program crashes
     if timeSinceSwp > 10 then 
         world:saveWorld(DATAFILE..".eswp") 
         timeSinceSwp = 0
@@ -131,8 +131,7 @@ function love.update(dt)
         end
     ----------------------------------------------
     elseif editState == "drawfree" then
-        if love.mouse.isDown(1) and mouse.tileX > 0 and mouse.tileY > 0 
-        and mouse.tileX <= world.LEVEL_WIDTH and mouse.tileY <= world.LEVEL_HEIGHT
+        if love.mouse.isDown(1)
         and world:levelExists(mouse.levelX, mouse.levelY) then
             world:setTile(mouse.levelX, mouse.levelY, mouse.tileX, mouse.tileY, tileType)
         elseif not love.mouse.isDown(1) then
@@ -140,7 +139,7 @@ function love.update(dt)
         end
     ----------------------------------------------
     elseif editState == "deletelevel" then
-        --if we hold the mouse on a level for three seconds, delete it
+        --if the user holds the mouse on a level for 1.5 seconds, delete it
         if love.mouse.isDown(1) and mouse.levelX == mouse.holdLevelX 
         and mouse.levelY == mouse.holdLevelY then
             mouse.holdTime = mouse.holdTime + dt
@@ -176,7 +175,7 @@ function love.draw()
         rect:draw(mouse, world)
     end
 
-    --show tile selection
+    --show tile selection progress
     if tileSelect ~= "" then
         love.graphics.setColor(0, 0, 0)
         love.graphics.rectangle("fill", 0, 0, 50, 20)
@@ -185,7 +184,7 @@ function love.draw()
     end
 
     --show info box
-    --move out of the way if the mouse is in that area
+    --move out of the way if the mouse is near the box
     local infoXPos
     if expandView and mouse.x < 200 and mouse.y > WINDOW_HEIGHT-30 then
         infoXPos = WINDOW_WIDTH-200

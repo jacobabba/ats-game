@@ -66,7 +66,7 @@ do
         end
     end
 
-    --if expandview is on, then draw this levels, and all levels bordering it
+    --if expandview is on, then draw this level, and all levels bordering it
     function w:drawLevel(levelX, levelY, showGrid, x, y, scale)
         local s = self.TILE_SIZE*scale --scaled tile size
 
@@ -108,6 +108,7 @@ do
         love.graphics.print("("..levelX..", "..levelY..")", 10+x, 10+y)
     end
 
+    --load the world from a file (s)
     function w:loadWorld(s)
         function _levelEntry(levelX, levelY, g)
             self:newLevel(levelX, levelY, g)
@@ -116,6 +117,7 @@ do
         dofile(s)
     end
 
+    --save the world to a file (s)
     function w:saveWorld(s)
         local f = assert(io.open(s, "w"))
 

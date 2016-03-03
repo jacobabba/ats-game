@@ -7,6 +7,7 @@
 do
     local _r = {}
 
+    --always call when the user starts drawing a new rect
     function _r:reset(startTileX, startTileY, startLevelX, startLevelY)
         self.startTileX = startTileX
         self.startTileY = startTileY
@@ -22,6 +23,7 @@ do
         self.levelShiftY = 0
     end
 
+    --update the state of the rect while the user is still drawing
     function _r:update(mouse, world)
         --check if we need to snap to something or unsnap (x)
         if self.prevLevelX ~= mouse.levelX then
@@ -127,6 +129,7 @@ do
         end
     end
 
+    --write the rect to the world once the user is done drawing
     function _r:write(world)
         local modX = (self.tileShiftX>0 and 1 or -1)
         local modY = (self.tileShiftY>0 and 1 or -1)
@@ -154,6 +157,7 @@ do
         end
     end
 
+    --show the preview rect while the user is drawing
     function _r:draw(mouse, world)
         local startX, startY, scale
 

@@ -1,29 +1,15 @@
 require("run")
 
+DATA_FILE = "editor\\DATA.lua"
+
 function love.load()
-    local levelGrid = {}
-    for i=1,40 do
-        levelGrid[i] = {}
-        for j=1,30 do
-            levelGrid[i][j] = 0
-        end
-    end
-
-    for i=1,40 do
-        levelGrid[i][29] = 1
-    end
-
-    for i=20,40 do
-        levelGrid[i][10] = 1
-    end
-    levelGrid[40][9] = 1
-
     local world = require("world")
 
-    world:newLevel(0, 0, levelGrid)
-    world:newLevel(1, 0, levelGrid)
+    world:loadWorld(DATA_FILE)
 
     local player = require("player")
+
+    player:setPosition(world.playerSpawn.tileX, world.playerSpawn.tileY, world)
     
     keyList = {}
     keyList.left = false

@@ -5,7 +5,8 @@ function love.run()
         love.math.setRandomSeed(os.time())
     end
 
-    if love.load then local world, player = love.load(arg) end
+    local world, player
+    if love.load then world, player = love.load(arg) end
 
     -- We don't want the first frame's dt to include time taken by love.load.
     if love.timer then love.timer.step() end

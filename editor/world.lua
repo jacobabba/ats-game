@@ -10,12 +10,25 @@ do
     w.LEVEL_HEIGHT = 30 --height/width should be bigger than 1 or bad stuff happens
     w.LEVEL_WIDTH = 40
     w.TILE_SIZE = 20
+    w.playerSpawn = {levelX=1, levelY=1, tileX=1, tileY=1}
 
     w.levelGrid = {}
 
     --sets the tile in the specified level
     function w:setTile(levelX, levelY, x, y, tileType)
-        self.levelGrid[levelX][levelY].tileGrid[x][y] = tileType
+        if self.playerSpawn.levelX ~= levelX or self.playerSpawn.levelY ~= levelY
+        or self.playerSpawn.tileX ~= x or self.playerSpawn.tileY ~= y then
+            self.levelGrid[levelX][levelY].tileGrid[x][y] = tileType
+        end
+    end
+
+    function w:setSpawn(levelX, levelY, tileX, tileY)
+        if self.levelGrid[levelX][levelY].tileGrid[tileX][tileY] == 0 then
+            self.playerSpawn.levelX = levelX
+            self.playerSpawn.levelY = levelY
+            self.playerSpawn.tileX = tileX
+            self.playerSpawn.tileY = tileY
+        end
     end
 
     function w:levelExists(levelX, levelY)
@@ -88,6 +101,13 @@ do
                 end
             end
 
+            --draw player spawn
+            if levelX == self.playerSpawn.levelX and levelY == self.playerSpawn.levelY then
+                love.graphics.setColor(168, 99, 181)
+                love.graphics.rectangle("fill", (self.playerSpawn.tileX-1)*s+x, 
+                                        (self.playerSpawn.tileY-1)*s+y, s, s)
+            end
+
             --draw grid
             if showGrid then
                 love.graphics.setColor(127, 127, 127)
@@ -112,6 +132,10 @@ do
     function w:loadWorld(s)
         function _levelEntry(levelX, levelY, g)
             self:newLevel(levelX, levelY, g)
+        end
+
+        function _playerSpawn(levelX, levelY, tileX, tileY)
+            self:setSpawn(levelX, levelY, tileX, tileY)
         end
 
         dofile(s)
@@ -144,6 +168,9 @@ do
                 f:write("\n})\n\n")
             end
         end
+
+        f:write("_playerSpawn("..self.playerSpawn.levelX..", "..self.playerSpawn.levelY
+                ..", "..self.playerSpawn.tileX..", "..self.playerSpawn.tileY..")\n")
 
         f:close()
     end

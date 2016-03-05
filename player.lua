@@ -1,14 +1,14 @@
 local p = {}
 p.MAX_HSPEED = 3
-p.HACCEL = .1
-p.MAX_VSPEED = 5
+p.HACCEL = .3
+p.MAX_VSPEED = 8
 p.VACCEL_GRAVITY = .5
 p.VACCEL_JUMP = 10
 p.WIDTH = 10
 p.HEIGHT = 10
 
-p.x = 440
-p.y = 510
+p.x = 0
+p.y = 0
 p.vy = 0
 p.vx = 0
 
@@ -70,6 +70,11 @@ function p:changeLevel(x, y, w)
     elseif y == 1 then
         self.y = self.y - w.LEVEL_HEIGHT * w.TILE_SIZE
     end
+end
+
+function p:setPosition(tileX, tileY, world)
+    self.x = (tileX-1)*world.TILE_SIZE + world.TILE_SIZE/2 - self.WIDTH/2
+    self.y = (tileY-1)*world.TILE_SIZE + world.TILE_SIZE - self.HEIGHT
 end
 
 return p

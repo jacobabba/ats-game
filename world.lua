@@ -111,11 +111,11 @@ do
         *bottom side of current player 
         (p1)_____________|______(p2) 
             \            |      \
-            \(cl)       |       \(cr)
-    (cy)-----\-------------------\-------- grid line passed!
-                \         |         \
+             \(cl)       |       \(cr)
+     (cy)-----\-------------------\-------- grid line passed!
+               \         |         \
             (p3)\________|__________\(p4)
-                        |           
+                         |           
             *bottom side of projected player
     
         Cl and cr are the critical points, and since each lies on a different
@@ -172,7 +172,7 @@ do
             crx = clx + (startLineX2-startLineX1)
             
             if invert then
-                ycoordl = math.ceil(clx/20)
+                ycoordl = math.ceil((clx-clx%20)/20 + 1)
                 ycoordr = math.ceil(crx/20)
                 xcoordr = mod*cy/20
                 if mod == 1 then 
@@ -180,7 +180,7 @@ do
                 end
                 xcoordl = xcoordr 
             else
-                xcoordl = math.ceil(clx/20)
+                xcoordl = math.ceil((clx-clx%20)/20 + 1)
                 xcoordr = math.ceil(crx/20)
                 ycoordr = mod*cy/20
                 if mod == 1 then 

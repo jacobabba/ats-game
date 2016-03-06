@@ -52,8 +52,8 @@ do
         if shiftX < 0 then xs = 1
         elseif shiftX > 0 then xs = -1 end
     
-        if shiftY < 0 then yx = 1
-        elseif shiftY > 0 then yx = -1 end
+        if shiftY < 0 then ys = 1
+        elseif shiftY > 0 then ys = -1 end
     
         if shiftX ~= 0 or shiftY ~= 0 then
             l = self.levelGrid[self.levelX+xs][self.levelY+ys]

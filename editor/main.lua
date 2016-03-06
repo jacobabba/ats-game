@@ -234,6 +234,7 @@ function love.keypressed(key)
     elseif key == "f" then editMode = "free"
     elseif key == "x" then editMode = "deletelevel"
     elseif key == "q" then world:setSpawn(mouse.levelX, mouse.levelY, mouse.tileX, mouse.tileY)
+    elseif key == "l" then os.execute([["C:\Program Files\LOVE\love.exe" --console %CD%\..]])
     elseif (key == "0" or key == "1" or key == "2" or key == "3" or key == "4" 
     or key == "5" or key == "6" or key == "7" or key == "8" or key == "9")
     and string.len(tileSelect) < 3 then

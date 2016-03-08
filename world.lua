@@ -32,13 +32,14 @@ do
         self.levelGrid[x][y] = l
     end
     
-    function w:drawLevel(shiftX, shiftY)
+    function w:drawLevel()
         local l = self.levelGrid[self.levelX][self.levelY]
         local s = self.TILE_SIZE
+        love.graphics.setColor(255, 255, 255)
         for i=1,self.LEVEL_WIDTH do
             for j=1,self.LEVEL_HEIGHT do
                 if l.tileGrid[i][j] == 1 then
-                    love.graphics.rectangle("fill", (i-1)*s+shiftX, (j-1)*s+shiftY, s, s)
+                    love.graphics.rectangle("fill", (i-1)*s+self.shiftX, (j-1)*s+self.shiftY, s, s)
                 end
             end
         end
@@ -49,18 +50,18 @@ do
         local lw = self.LEVEL_WIDTH * self.TILE_SIZE
         local lh = self.LEVEL_HEIGHT * self.TILE_SIZE
     
-        if shiftX < 0 then xs = 1
-        elseif shiftX > 0 then xs = -1 end
+        if self.shiftX < 0 then xs = 1
+        elseif self.shiftX > 0 then xs = -1 end
     
-        if shiftY < 0 then ys = 1
-        elseif shiftY > 0 then ys = -1 end
+        if self.shiftY < 0 then ys = 1
+        elseif self.shiftY > 0 then ys = -1 end
     
-        if shiftX ~= 0 or shiftY ~= 0 then
+        if self.shiftX ~= 0 or self.shiftY ~= 0 then
             l = self.levelGrid[self.levelX+xs][self.levelY+ys]
             for i=1,self.LEVEL_WIDTH do
                 for j=1,self.LEVEL_HEIGHT do
                     if l.tileGrid[i][j] == 1 then
-                        love.graphics.rectangle("fill", (i-1)*s+shiftX+xs*lw, (j-1)*s+shiftY+ys*lh, s, s)
+                        love.graphics.rectangle("fill", (i-1)*s+self.shiftX+xs*lw, (j-1)*s+self.shiftY+ys*lh, s, s)
                     end
                 end
             end
@@ -196,12 +197,13 @@ do
         end
     end
     
-    --findLevelCollisions returns:
+    --find out if we're bumping into a rigid object
+    --findRigidCollisions returns:
     --  ctx - time of x collision (1 if no collision)
     --  cty - time of y collision (1 if no collision)
     --  xCol - true if there was an x collision
     --  yCol - true if there was a y collision
-    function w:findLevelCollisions(pX, pY, pVX, pVY, pW, pH)
+    function w:findRigidCollisions(pX, pY, pVX, pVY, pW, pH)
         --find vertical collision
         local cty = self:findSingleAxisCollision(pX, pW, pVX, pY, pH, pVY, false) 
     

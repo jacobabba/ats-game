@@ -88,15 +88,44 @@ do
             love.graphics.print("Level doesn't exist. Click to create.", 100+x, 100+y)
         else
             --draw tiles
-            local l = self.levelGrid[levelX][levelY]
+            --get the level's grid
+            local lg = self.levelGrid[levelX][levelY].tileGrid
             love.graphics.setColor(255, 255, 255)
             for i=1,self.LEVEL_WIDTH do
                 for j=1,self.LEVEL_HEIGHT do
-                    local t = TILE_TYPES[l.tileGrid[i][j]]
+                    local t_id = lg[i][j]
+                    local t = TILE_TYPES[t_id]
+                    local xPos = (i-1)*s+x
+                    local yPos = (j-1)*s+y
 
-                    if t and t.isTile then
-                        love.graphics.setColor(t.tileColorR, t.tileColorG, t.tileColorB)
-                        love.graphics.rectangle("fill", (i-1)*s+x, (j-1)*s+y, s, s)
+                    if t and t.hasBox then
+                        love.graphics.setColor(t.boxColorR, t.boxColorG, t.boxColorB)
+                        love.graphics.rectangle("fill", xPos, yPos, s, s)
+                    end
+
+                    --figure out drawing for lines
+                    if t and t.hasLine then
+                        love.graphics.setColor(t.lineColorR, t.lineColorG, t.lineColorB)
+                        love.graphics.setLineStyle("rough")
+                        love.graphics.setLineWidth(2)
+
+                        --find out whether the immediate tiles are the same line type as this one
+                        local up = (lg[i][j-1] == t_id) and true or false
+                        local down = (lg[i][j+1] == t_id) and true or false
+                        local left = (lg[i-1] and lg[i-1][j] == t_id) and true or false
+                        local right = (lg[i+1] and lg[i+1][j] == t_id) and true or false
+
+                        
+                        if not (left or right) then
+                            love.graphics.line(xPos+s/2, yPos, xPos+s/2, yPos+s)
+                        elseif (left or right) and not (up or down) then
+                            love.graphics.line(xPos, yPos+s/2, xPos+s, yPos+s/2)
+                        else
+                            if up then love.graphics.line(xPos+s/2, yPos, xPos+s/2, yPos+s/2) end
+                            if down then love.graphics.line(xPos+s/2, yPos+s/2, xPos+s/2, yPos+s) end
+                            if left then love.graphics.line(xPos, yPos+s/2, xPos+s/2, yPos+s/2) end
+                            if right then love.graphics.line(xPos+s/2, yPos+s/2, xPos+s, yPos+s/2) end
+                        end
                     end
                 end
             end

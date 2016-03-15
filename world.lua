@@ -45,18 +45,12 @@ do
         end
     
         --if we're shifting we need to draw other levels
-        local xs = 0
-        local ys = 0
-        local lw = self.LEVEL_WIDTH * self.TILE_SIZE
-        local lh = self.LEVEL_HEIGHT * self.TILE_SIZE
-    
-        if self.shiftX < 0 then xs = 1
-        elseif self.shiftX > 0 then xs = -1 end
-    
-        if self.shiftY < 0 then ys = 1
-        elseif self.shiftY > 0 then ys = -1 end
-    
         if self.shiftX ~= 0 or self.shiftY ~= 0 then
+            local xs = ((self.shiftX < 0) and 1) or ((self.shiftX > 0) and -1) or 0
+            local ys = ((self.shiftY < 0) and 1) or ((self.shiftY > 0) and -1) or 0
+            local lw = self.LEVEL_WIDTH * self.TILE_SIZE
+            local lh = self.LEVEL_HEIGHT * self.TILE_SIZE
+
             l = self.levelGrid[self.levelX+xs][self.levelY+ys]
             for i=1,self.LEVEL_WIDTH do
                 for j=1,self.LEVEL_HEIGHT do

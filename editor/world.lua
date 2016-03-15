@@ -14,6 +14,9 @@ do
 
     w.levelGrid = {}
 
+    w.levelClass = require("level")
+    w.objTypes = require("objTypes")
+
     --sets the tile in the specified level
     function w:setTile(levelX, levelY, x, y, tileType)
         if self.playerSpawn.levelX ~= levelX or self.playerSpawn.levelY ~= levelY
@@ -58,8 +61,6 @@ do
         self.levelGrid[levelX] = self.levelGrid[levelX] or {}
         if self.levelGrid[levelX][levelY] then error("attempt to add a level that already exists") end
 
-        local l = {}
-
         g = g or {}
         for i=1,self.LEVEL_WIDTH do
             g[i] = g[i] or {}
@@ -67,7 +68,8 @@ do
                 g[i][j] = g[i][j] or 0
             end
         end
-        l.tileGrid = g
+
+        local l = self.levelClass:newLevel(g)
 
         self.levelGrid[levelX][levelY] = l
     end

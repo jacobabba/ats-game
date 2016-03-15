@@ -1,6 +1,6 @@
 require("run")
 
-DATA_FILE = "c:\\love\\ats-game.git\\editor\\DATA.lua"
+DATA_FILE = "editor/DATA.lua"
 
 function love.load()
     local world = require("world")

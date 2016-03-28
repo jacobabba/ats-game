@@ -12,7 +12,7 @@ do
     function ot:getType(t)
         --only load a type if we need it
         if not self.types[t] then
-            self.types[t] = require(t.."Obj")
+            self.types[t] = require(t.."_obj")
         end
 
         return self.types[t]

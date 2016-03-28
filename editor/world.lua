@@ -15,7 +15,7 @@ do
     w.levelGrid = {}
 
     w.levelClass = require("level")
-    w.objTypes = require("objTypes")
+    w.objTypes = require("obj_types")
 
     --sets the tile in the specified level
     function w:setTile(levelX, levelY, x, y, tileType)

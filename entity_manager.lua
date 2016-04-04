@@ -6,7 +6,7 @@ do
     local index = {}
 
     --matches component type -> component type base class
-    index.componentTypes = dofile("component_types")
+    index.componentTypes = require("component_types")
 
     --the components is an optional table which maps 
     --    {component type -> {preliminary values for that component}}
@@ -65,10 +65,14 @@ do
     --gets all entities that have all requested components
     --signature should be a table containing names of required components
     --return table has structure {entity ids -> {component name -> component}}
-    function index:getEntFromSig(signature)
+    function index:getEntsFromSig(signature)
         --entities maps {entity id -> {component type -> component}}
         local entities = {}
-        local n = table.getn(signature)
+
+        --get table length
+        local n = 0
+        for _ in ipairs(signature) do n = n + 1 end
+
         for k,v in pairs(self.components[signature[n]]) do
             entities[k] = {}
             entities[k][signature[n]] = v
@@ -88,6 +92,19 @@ do
         end
 
         return entities
+    end
+
+    --for debug purposes. prints a list of all entities and their data
+    function index:display()
+        local inspect = require("inspect")
+        for k,v in pairs(self.entityIds) do
+            for kk,vv in pairs(self.components) do
+                if vv[k] then
+                    print("entity id:"..k.." component:"..kk)
+                    print(inspect(vv[k]))
+                end
+            end
+        end
     end
     
     local entityManagerClass = {}
@@ -113,5 +130,5 @@ do
         return manager
     end
 
-    return em
+    return entityManagerClass
 end

@@ -11,6 +11,10 @@ do
     w.shiftY = 0
 
     w.playerSpawn = {levelX=1, levelY=1, tileX=1, tileY=1}
+
+    function w:getCurrentLevel()
+        return self.levelGrid[self.levelX][self.levelY]
+    end
     
     --make a new level with coords x,y in the world
     --uses g as the level's grid

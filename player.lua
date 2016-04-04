@@ -37,7 +37,8 @@ do
         end
 
         --check collisions, apply movement
-        local ctx, cty = w:findRigidCollisions(self.x, self.y, self.vx, self.vy, self.WIDTH, self.HEIGHT)
+        local ctx, cty = 
+            w:findRigidCollisions(self.x, self.y, self.vx, self.vy, self.WIDTH, self.HEIGHT)
 
         self.x = self.x + self.vx*ctx
         self.y = self.y + self.vy*cty

@@ -1,4 +1,6 @@
 --this system handles the collisions between rigid entities and the level
+--component signature: transform, movement, rigid
+
 do
     --NOTE: for two moving objects, find point at which they share an x/y coord, and check if the two lines intersect.
     
@@ -53,7 +55,8 @@ do
     
     --TODO:clean these functions up
     
-    --returns 1 if no collision happens, otherwise returns the time that the collision happened
+    --returns 1 if no collision happens, otherwise returns the time that 
+    --the collision happened
     local function findSingleAxisCollision(level, pX, pW, pVX, pY, pH, pVY, invert) 
         -- TODO: document this better
         if pVY == 0 then return nil end
@@ -101,7 +104,8 @@ do
                 ycoordl = ycoordr 
             end
     
-            if level[xcoordl] and level[xcoordl][ycoordl] == 1 or level[xcoordr] and level[xcoordr][ycoordr] == 1 then
+            if level[xcoordl] and level[xcoordl][ycoordl] == 1 
+            or level[xcoordr] and level[xcoordr][ycoordr] == 1 then
                 --collision!
                 return cty
             else
@@ -110,8 +114,9 @@ do
         end
     end
  
-    local function levelCollisionSystem(self, entityManagers, world)
-        local entities, indexToManagerId = self.getEntities(entityManagers)
+    local levelCollisionSystem = function (self, entityManagers, world)
+        local entities, indexToManagerId =
+            self.getEntities(entityManagers, {"transform", "movement", "rigid"})
 
         for k,v in ipairs(entities) do
             --find vertical collision
@@ -161,6 +166,7 @@ do
             v.motion.xVelocity = v.motion.xVelocity * ctx
             v.motion.yVelocity = v.motion.yVelocity * cty
         end
+    end
 
     return levelCollisionSystem
 end

@@ -6,7 +6,7 @@ do
     local index = {}
 
     --matches component type -> component type base class
-    index.componentTypes = require("component_types")
+    index.componentTypes = require("components/component_types")
 
     --the components is an optional table which maps 
     --    {component type -> {preliminary values for that component}}

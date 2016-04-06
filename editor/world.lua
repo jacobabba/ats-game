@@ -9,7 +9,7 @@ do
     local w = {}
     w.LEVEL_HEIGHT = 30 --height/width should be bigger than 1 or bad stuff happens
     w.LEVEL_WIDTH = 40
-    w.TILE_SIZE = 20
+    w.TILE_SIZE = 15
     w.playerSpawn = {levelX=1, levelY=1, tileX=1, tileY=1}
 
     w.levelGrid = {}

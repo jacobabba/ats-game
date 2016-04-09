@@ -41,11 +41,11 @@ do
 
     --defines actions to be done on different types of keypresses
     types.input = componentClass:newSubClass{
-        up = "do_up",
-        down = "do_down",
-        left = "do_left",
-        right = "do_right",
-        jump = "do_jump"
+        up = nil,
+        down = nil,
+        left = nil,
+        right = nil,
+        jump = nil
     }
 
     types.player{

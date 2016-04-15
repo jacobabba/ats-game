@@ -139,7 +139,7 @@ do
                 local tpX = v.transform.xPosition + v.motion.xVelocity*ctx
                 local tpY = v.transform.yPosition + v.motion.yVelocity*ctx
         
-                cty = findSingleAxisCollision(world:getCurrentLevel(),
+                cty = findSingleAxisCollision(world:getCurrentLevel().tileGrid,
                                               tpX, v.transform.width, 0, tpY, 
                                               v.transform.height, 
                                               v.motion.yVelocity*(1-ctx), false) 
@@ -149,7 +149,7 @@ do
                 local tpX = v.transform.xPosition + v.motion.xVelocity*cty
                 local tpY = v.transform.yPosition + v.motion.yVelocity*cty
         
-                ctx = findSingleAxisCollision(world:getCurrentLevel(),
+                ctx = findSingleAxisCollision(world:getCurrentLevel().tileGrid,
                                               tpY, v.transform.height, 0, tpX, 
                                               v.transform.width, 
                                               v.motion.xVelocity*(1-cty), true) 

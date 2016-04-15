@@ -30,6 +30,10 @@ do
 
         if components then
             for k,v in pairs(components) do
+                if not self.components[k] then
+                    error("Attempt to create a component with a non-existant type")
+                end
+
                 self.components[k][id] = self.componentTypes[k]:newComponent(v)
             end
         end

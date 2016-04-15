@@ -15,6 +15,7 @@ do
         function compSubClass:newComponent(vals)
             local component = {}
 
+            --recursive function used in case of nested tables
             local function copyDefaults(source, destination)
                 for k,v in pairs(source) do
                     if type(v) ~= "table" then

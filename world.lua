@@ -1,8 +1,5 @@
 do
     local w = {}
-    w.LEVEL_HEIGHT = 30
-    w.LEVEL_WIDTH = 40
-    w.TILE_SIZE = 20
     
     w.levelGrid = {}
     w.levelX = 1
@@ -25,9 +22,9 @@ do
         local l = {}
     
         g = g or {}
-        for i=1,self.LEVEL_WIDTH do
+        for i=1,LEVEL_WIDTH do
             g[i] = g[i] or {}
-            for j=1,self.LEVEL_HEIGHT do
+            for j=1,LEVEL_HEIGHT do
                 g[i][j] = g[i][j] or 0
             end
         end
@@ -35,13 +32,17 @@ do
     
         self.levelGrid[x][y] = l
     end
+
+    function w:getEntityManager(levelX, levelY)
+
+    end
     
     function w:drawLevel()
         local l = self.levelGrid[self.levelX][self.levelY]
-        local s = self.TILE_SIZE
+        local s = TILE_SIZE
         love.graphics.setColor(255, 255, 255)
-        for i=1,self.LEVEL_WIDTH do
-            for j=1,self.LEVEL_HEIGHT do
+        for i=1,LEVEL_WIDTH do
+            for j=1,LEVEL_HEIGHT do
                 if l.tileGrid[i][j] == 1 then
                     love.graphics.rectangle("fill", (i-1)*s+self.shiftX, (j-1)*s+self.shiftY, s, s)
                 end
@@ -52,12 +53,12 @@ do
         if self.shiftX ~= 0 or self.shiftY ~= 0 then
             local xs = ((self.shiftX < 0) and 1) or ((self.shiftX > 0) and -1) or 0
             local ys = ((self.shiftY < 0) and 1) or ((self.shiftY > 0) and -1) or 0
-            local lw = self.LEVEL_WIDTH * self.TILE_SIZE
-            local lh = self.LEVEL_HEIGHT * self.TILE_SIZE
+            local lw = LEVEL_WIDTH * TILE_SIZE
+            local lh = LEVEL_HEIGHT * TILE_SIZE
 
             l = self.levelGrid[self.levelX+xs][self.levelY+ys]
-            for i=1,self.LEVEL_WIDTH do
-                for j=1,self.LEVEL_HEIGHT do
+            for i=1,LEVEL_WIDTH do
+                for j=1,LEVEL_HEIGHT do
                     if l.tileGrid[i][j] == 1 then
                         love.graphics.rectangle("fill", (i-1)*s+self.shiftX+xs*lw, (j-1)*s+self.shiftY+ys*lh, s, s)
                     end
@@ -70,19 +71,32 @@ do
     function w:changeLevel(x, y)
         if x == -1 then
             self.levelX = self.levelX - 1
+            self.shiftX = self.shiftX - LEVEL_WIDTH * TILE_SIZE
         elseif x == 1 then
             self.levelX = self.levelX + 1
+            self.shiftX = self.shiftX + LEVEL_WIDTH * TILE_SIZE
         end
     
         if y == -1 then
             self.levelY = self.levelY - 1
+            self.shiftY = self.shiftY - LEVEL_HEIGHT * TILE_SIZE
         elseif y == 1 then
             self.levelY = self.levelY + 1
+            self.shiftY = self.shiftY + LEVEL_HEIGHT * TILE_SIZE
         end
     
-        if self.levelGrid[self.levelX] == nil or self.levelGrid[self.levelX][self.levelY] == nil then
+        if self.levelGrid[self.levelX] == nil 
+        or self.levelGrid[self.levelX][self.levelY] == nil then
             error("player entered a level that doesn't exist!")
         end
+    end
+
+    function w:update()
+        self.shiftX = self.shiftX*0.90
+        self.shiftY = self.shiftY*0.90
+
+        if self.shiftX < 1 and self.shiftX > -1 then self.shiftX = 0 end
+        if self.shiftY < 1 and self.shiftY > -1 then self.shiftY = 0 end
     end
     
     

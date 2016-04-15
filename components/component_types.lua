@@ -3,7 +3,7 @@
 
 do
     local types = {}
-    local componentClass = require("component_class")
+    local componentClass = dofile("components/component_class.lua")
 
     --location and size data
     types.transform = componentClass:newSubClass{
@@ -16,9 +16,6 @@ do
     --all entities that will be drawn to the screen should have 
     --this component and the transform component
     types.drawable = componentClass:newSubClass{
-        colorR = 255,
-        colorG = 255,
-        colorB = 255,
         drawType = "rectangle"
     }
 
@@ -26,33 +23,31 @@ do
     --and the transform component
     types.motion = componentClass:newSubClass{
         xVelocity = 0,
-        yVelocity = 0,
-        xVelocityCap = 0,
-        yVelocityCap = 0,
-        xAcceleration = 0,
-        yAcceleration = 0
+        yVelocity = 0
     }
 
     --entities that will colllide with the level should have this
     --component, the transform component, and the move component
     types.rigid = componentClass:newSubClass{
-
+        isOnGround = false
     }
 
-    --defines actions to be done on different types of keypresses
-    types.input = componentClass:newSubClass{
-        up = nil,
-        down = nil,
-        left = nil,
-        right = nil,
-        jump = nil
+    --defines data specific to the player
+    types.player = componentClass:newSubClass{
+        MAX_HSPEED = 3,
+        HACCEL = .3,
+        MAX_VSPEED = 8,
+        VACCEL_GRAVITY = .5,
+        VACCEL_JUMP = 11
     }
 
-    types.player{
-        state = "white"
+    --defines data specific to lines
+    types.line = componentClass:newSubClass{
+        segments = nil
     }
 
-    types.line{
+    --defines the "color state" of an entity
+    types.colorState = componentClass:newSubClass{
         state = "white"
     }
 

@@ -1,4 +1,6 @@
 --this system handles the collisions between rigid entities and the level
+--simply caps the velocity of an entity so that it doesn't go through things,
+--so this should be called before the movement system
 --component signature: transform, movement, rigid
 
 do
@@ -59,7 +61,7 @@ do
     --the collision happened
     local function findSingleAxisCollision(level, pX, pW, pVX, pY, pH, pVY, invert) 
         -- TODO: document this better
-        if pVY == 0 then return nil end
+        if pVY == 0 then return 1 end
         local startLineX1 = pX
         local startLineX2 = pX + pW
         local endLineX1 = pX+pVX
@@ -74,10 +76,10 @@ do
         end
         local endLineY = startLineY + pVY
     
-        local cy = mod*endLineY - (mod*endLineY)%20
+        local cy = mod*endLineY - (mod*endLineY)%TILE_SIZE
         
         if mod*startLineY > cy then
-            return nil
+            return 1
         else
             -- We are crossing a grid line
             local cty, clx, crx, xcoordl, xcoordr, ycoord
@@ -87,17 +89,17 @@ do
             crx = clx + (startLineX2-startLineX1)
             
             if invert then
-                ycoordl = math.ceil((clx-clx%20)/20 + 1)
-                ycoordr = math.ceil(crx/20)
-                xcoordr = mod*cy/20
+                ycoordl = math.ceil((clx-clx%TILE_SIZE)/TILE_SIZE + 1)
+                ycoordr = math.ceil(crx/TILE_SIZE)
+                xcoordr = mod*cy/TILE_SIZE
                 if mod == 1 then 
                     xcoordr = xcoordr+1 
                 end
                 xcoordl = xcoordr 
             else
-                xcoordl = math.ceil((clx-clx%20)/20 + 1)
-                xcoordr = math.ceil(crx/20)
-                ycoordr = mod*cy/20
+                xcoordl = math.ceil((clx-clx%TILE_SIZE)/TILE_SIZE + 1)
+                xcoordr = math.ceil(crx/TILE_SIZE)
+                ycoordr = mod*cy/TILE_SIZE
                 if mod == 1 then 
                     ycoordr = ycoordr+1 
                 end
@@ -116,51 +118,50 @@ do
  
     local levelCollisionSystem = function (self, entityManagers, world)
         local entities, indexToManagerId =
-            self.getEntities(entityManagers, {"transform", "movement", "rigid"})
+            self.getEntities(entityManagers, {"transform", "motion", "rigid"})
 
         for k,v in ipairs(entities) do
             --find vertical collision
-            local cty = findSingleAxisCollision(world.getCurrentLevel(), 
+            local cty = findSingleAxisCollision(world:getCurrentLevel().tileGrid,
                                                 v.transform.xPosition, v.transform.width, 
                                                 v.motion.xVelocity, 
-                                                v.transform.yPosition, v.transform.height, 
+                                                v.transform.yPosition, v.transform.height,
                                                 v.motion.yVelocity, false) 
         
             --find horizontal collision
-            local ctx = findSingleAxisCollision(world.getCurrentLevel(), 
+            local ctx = findSingleAxisCollision(world:getCurrentLevel().tileGrid,
                                                 v.transform.yPosition, v.transform.height, 
                                                 v.motion.yVelocity, 
                                                 v.transform.xPosition, v.transform.width, 
                                                 v.motion.xVelocity, true) 
-        
+
             if ctx <= cty then --horizontal happened first
                 local tpX = v.transform.xPosition + v.motion.xVelocity*ctx
                 local tpY = v.transform.yPosition + v.motion.yVelocity*ctx
         
-                cty = findSingleAxisCollision(world.getCurrentLevel(),
+                cty = findSingleAxisCollision(world:getCurrentLevel(),
                                               tpX, v.transform.width, 0, tpY, 
                                               v.transform.height, 
                                               v.motion.yVelocity*(1-ctx), false) 
         
-                if cty ~= nil then
-                    cty = ctx + (1-ctx)*cty
-                else
-                    cty = 1
-                end
+                cty = ctx + (1-ctx)*cty
             elseif ctx > cty then --vertical happened first
                 local tpX = v.transform.xPosition + v.motion.xVelocity*cty
                 local tpY = v.transform.yPosition + v.motion.yVelocity*cty
         
-                ctx = findSingleAxisCollision(world.getCurrentLevel(),
+                ctx = findSingleAxisCollision(world:getCurrentLevel(),
                                               tpY, v.transform.height, 0, tpX, 
                                               v.transform.width, 
                                               v.motion.xVelocity*(1-cty), true) 
         
-                if ctx ~= nil then
-                    ctx = cty + (1-cty)*ctx
-                else
-                    ctx = 1
-                end
+                ctx = cty + (1-cty)*ctx
+            end
+
+            --check if we're landing on ground
+            if v.motion.yVelocity > 0 and cty ~= 1 then
+                v.rigid.isOnGround = true
+            else
+                v.rigid.isOnGround = false
             end
 
             v.motion.xVelocity = v.motion.xVelocity * ctx

@@ -62,23 +62,23 @@ do
         love.graphics.rectangle("fill", x, y, self.WIDTH, self.HEIGHT)
     end
 
-    function p:changeLevel(x, y, w)
+    function p:changeLevel(x, y)
         if x == -1 then
-            self.x = self.x + w.LEVEL_WIDTH * w.TILE_SIZE
+            self.x = self.x + LEVEL_WIDTH * TILE_SIZE
         elseif x == 1 then
-            self.x = self.x - w.LEVEL_WIDTH * w.TILE_SIZE
+            self.x = self.x - LEVEL_WIDTH * TILE_SIZE
         end
 
         if y == -1 then
-            self.y = self.y + w.LEVEL_HEIGHT * w.TILE_SIZE
+            self.y = self.y + LEVEL_HEIGHT * TILE_SIZE
         elseif y == 1 then
-            self.y = self.y - w.LEVEL_HEIGHT * w.TILE_SIZE
+            self.y = self.y - LEVEL_HEIGHT * TILE_SIZE
         end
     end
 
-    function p:setPosition(tileX, tileY, world)
-        self.x = (tileX-1)*world.TILE_SIZE + world.TILE_SIZE/2 - self.WIDTH/2
-        self.y = (tileY-1)*world.TILE_SIZE + world.TILE_SIZE - self.HEIGHT
+    function p:setPosition(tileX, tileY)
+        self.x = (tileX-1)*TILE_SIZE + TILE_SIZE/2 - self.WIDTH/2
+        self.y = (tileY-1)*TILE_SIZE + TILE_SIZE - self.HEIGHT
     end
 
     return p

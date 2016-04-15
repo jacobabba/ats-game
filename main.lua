@@ -2,6 +2,13 @@ require("run")
 
 DATA_FILE = "editor/DATA.lua"
 
+LEVEL_HEIGHT = 30
+LEVEL_WIDTH = 40
+TILE_SIZE = 20
+
+ENTITY_MANAGER_CLASS = require("entity_manager")
+SYSTEMS_MANAGER = dofile("systems/systems_manager.lua")
+
 function love.load()
     local world = require("world")
 
@@ -9,7 +16,7 @@ function love.load()
 
     local player = require("player")
 
-    player:setPosition(world.playerSpawn.tileX, world.playerSpawn.tileY, world)
+    player:setPosition(world.playerSpawn.tileX, world.playerSpawn.tileY)
     
     --list containing which keys are currently pressed
     --and how many frames they've been held (1 on first frame; 0 if not held)
@@ -22,10 +29,30 @@ function love.load()
     font = love.graphics.newFont(12)
     love.graphics.setBackgroundColor(0, 0, 0)
 
-    return world, player, keyList
+    local globalEntities = ENTITY_MANAGER_CLASS:newManager()
+
+    globalEntities:addEntity(
+        {
+            player = {},
+            transform = {
+                xPosition = (world.playerSpawn.tileX-1)*TILE_SIZE + TILE_SIZE/2 - 5,
+                yPosition = (world.playerSpawn.tileY-1)*TILE_SIZE + TILE_SIZE - 10,
+                width = 10,
+                height = 10
+            },
+            motion = {},
+            rigid = {},
+            drawable = {}
+        },
+        "player"
+    )
+
+
+
+    return world, player, keyList, globalEntities
 end
 
-function love.update(dt, world, player, keyList)
+function love.update(dt, world, player, keyList, globalEntities)
     --check inputs
     for k, v in pairs(keyList) do
         if love.keyboard.isDown(v.key) then
@@ -36,47 +63,48 @@ function love.update(dt, world, player, keyList)
             v.frame = 0
         end
     end
+
+    local managers = {globalEntities}
+
+    SYSTEMS_MANAGER:playerSystem(managers, keyList)
+    SYSTEMS_MANAGER:levelCollisionSystem(managers, world)
+    SYSTEMS_MANAGER:movementSystem(managers)
+    SYSTEMS_MANAGER:levelNavSystem(managers, world)
     
-    player:update(keyList, world)
+    --[[player:update(keyList, world)
 
     --check if we're going to the next level
     if player.x < -player.WIDTH/2 then
-        player:changeLevel(-1, 0, world)
+        player:changeLevel(-1, 0)
         world:changeLevel(-1, 0)
-        world.shiftX = world.shiftX - world.LEVEL_WIDTH * world.TILE_SIZE
-    elseif player.x > world.LEVEL_WIDTH * world.TILE_SIZE - player.WIDTH/2 then
-        player:changeLevel(1, 0, world)
+    elseif player.x > LEVEL_WIDTH * TILE_SIZE - player.WIDTH/2 then
+        player:changeLevel(1, 0)
         world:changeLevel(1, 0)
-        world.shiftX = world.shiftX + world.LEVEL_WIDTH * world.TILE_SIZE
     end
 
     if player.y < -player.HEIGHT/2 then
-        player:changeLevel(0, -1, world)
+        player:changeLevel(0, -1)
         world:changeLevel(0, -1)
-        world.shiftY = world.shiftY - world.LEVEL_HEIGHT * world.TILE_SIZE
-    elseif player.y > world.LEVEL_HEIGHT * world.TILE_SIZE - player.HEIGHT/2 then
-        player:changeLevel(0, 1, world)
+    elseif player.y > LEVEL_HEIGHT * TILE_SIZE - player.HEIGHT/2 then
+        player:changeLevel(0, 1)
         world:changeLevel(0, 1)
-        world.shiftY = world.shiftY + world.LEVEL_HEIGHT * world.TILE_SIZE
-    end
+    end]]
 
-    world.shiftX = world.shiftX*0.90
-    world.shiftY = world.shiftY*0.90
-
-    if world.shiftX < 1 and world.shiftX > -1 then world.shiftX = 0 end
-    if world.shiftY < 1 and world.shiftY > -1 then world.shiftY = 0 end
+    world:update()
 end
 
-function love.draw(interpolate, world, player)
+function love.draw(interpolate, world, player, globalEntities)
     world:drawLevel()
 
-    player:draw(interpolate, world.shiftX, world.shiftY)
+    local managers = {globalEntities}
+
+    SYSTEMS_MANAGER:drawSystem(managers, world, interpolate)
+
+    --player:draw(interpolate, world.shiftX, world.shiftY)
 
     --debug
     love.graphics.setColor(255, 117, 117)
     love.graphics.setFont(font)
-    love.graphics.print(player.x, 200, 0)
-    love.graphics.print(player.y, 400, 0)
     love.graphics.print(love.timer.getFPS(), 0, 10)
     love.graphics.print(world.shiftX, 200, 10)
     love.graphics.print(world.shiftY, 400, 10)

@@ -21,8 +21,11 @@ do
     end
 
     --add all systems to the manager here
-    systemManager.levelCollisionSystem = require("level_collision_system.lua")
-    systemManager.movementSystem = require("movement_system.lua")
+    systemManager.levelCollisionSystem = dofile("systems/level_collision_system.lua")
+    systemManager.movementSystem = dofile("systems/movement_system.lua")
+    systemManager.levelNavSystem = dofile("systems/level_nav_system.lua")
+    systemManager.playerSystem = dofile("systems/player_system.lua")
+    systemManager.drawSystem = dofile("systems/draw_system.lua")
 
     return systemManager
 end

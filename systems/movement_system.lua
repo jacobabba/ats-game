@@ -4,11 +4,11 @@
 do
     local movementSystem = function (self, entityManagers)
         local entities, indexToManagerId = 
-            self.getEntities(entityManager, {"transform", "motion"})
+            self.getEntities(entityManagers, {"transform", "motion"})
         
         for k,v in ipairs(entities) do
-            v.transform.x = v.transform.x + v.motion.xVelocity
-            v.transform.y = v.transform.y + v.motion.yVelocity
+            v.transform.xPosition = v.transform.xPosition + v.motion.xVelocity
+            v.transform.yPosition = v.transform.yPosition + v.motion.yVelocity
         end
     end
 

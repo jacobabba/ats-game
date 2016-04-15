@@ -83,6 +83,10 @@ do
             for entk,entv in pairs(entities) do
                 --if this entity has this component, add that component to the entity list
                 --otherwise, remove that entity from our list
+                if not self.components[sigv] then
+                    error("Signature contains a component that doesn't exist")
+                end
+
                 if self.components[sigv][entk] then
                     entv[sigv] = self.components[sigv][entk]
                 else

@@ -135,7 +135,9 @@ do
                                                 v.transform.xPosition, v.transform.width, 
                                                 v.motion.xVelocity, true) 
 
-            if ctx <= cty then --horizontal happened first
+            if ctx == 1 and cty == 1 then --no collision happened
+                return
+            elseif ctx <= cty then --horizontal happened first
                 local tpX = v.transform.xPosition + v.motion.xVelocity*ctx
                 local tpY = v.transform.yPosition + v.motion.yVelocity*ctx
         

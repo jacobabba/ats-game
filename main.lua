@@ -14,10 +14,6 @@ function love.load()
 
     world:loadWorld(DATA_FILE)
 
-    local player = require("player")
-
-    player:setPosition(world.playerSpawn.tileX, world.playerSpawn.tileY)
-    
     --list containing which keys are currently pressed
     --and how many frames they've been held (1 on first frame; 0 if not held)
     local keyList = {
@@ -49,10 +45,10 @@ function love.load()
 
 
 
-    return world, player, keyList, globalEntities
+    return world, keyList, globalEntities
 end
 
-function love.update(dt, world, player, keyList, globalEntities)
+function love.update(dt, world, keyList, globalEntities)
     --check inputs
     for k, v in pairs(keyList) do
         if love.keyboard.isDown(v.key) then
@@ -71,36 +67,15 @@ function love.update(dt, world, player, keyList, globalEntities)
     SYSTEMS_MANAGER:movementSystem(managers)
     SYSTEMS_MANAGER:levelNavSystem(managers, world)
     
-    --[[player:update(keyList, world)
-
-    --check if we're going to the next level
-    if player.x < -player.WIDTH/2 then
-        player:changeLevel(-1, 0)
-        world:changeLevel(-1, 0)
-    elseif player.x > LEVEL_WIDTH * TILE_SIZE - player.WIDTH/2 then
-        player:changeLevel(1, 0)
-        world:changeLevel(1, 0)
-    end
-
-    if player.y < -player.HEIGHT/2 then
-        player:changeLevel(0, -1)
-        world:changeLevel(0, -1)
-    elseif player.y > LEVEL_HEIGHT * TILE_SIZE - player.HEIGHT/2 then
-        player:changeLevel(0, 1)
-        world:changeLevel(0, 1)
-    end]]
-
     world:update()
 end
 
-function love.draw(interpolate, world, player, globalEntities)
+function love.draw(interpolate, world, globalEntities)
     world:drawLevel()
 
     local managers = {globalEntities}
 
     SYSTEMS_MANAGER:drawSystem(managers, world, interpolate)
-
-    --player:draw(interpolate, world.shiftX, world.shiftY)
 
     --debug
     love.graphics.setColor(255, 117, 117)

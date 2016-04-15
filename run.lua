@@ -5,8 +5,8 @@ function love.run()
         love.math.setRandomSeed(os.time())
     end
 
-    local world, player, keyList, globalEntities
-    if love.load then world, player, keyList, globalEntities = love.load(arg) end
+    local world, keyList, globalEntities
+    if love.load then world, keyList, globalEntities = love.load(arg) end
 
     -- We don't want the first frame's dt to include time taken by love.load.
     if love.timer then love.timer.step() end
@@ -39,7 +39,7 @@ function love.run()
         -- Call update and draw
         while lag >= TIME_PER_UPDATE do
             -- will pass 0 if love.timer is disabled
-            if love.update then love.update(dt, world, player, keyList, globalEntities) end 
+            if love.update then love.update(dt, world, keyList, globalEntities) end 
             lag = lag - TIME_PER_UPDATE
         end
 
@@ -47,7 +47,7 @@ function love.run()
             love.graphics.clear(love.graphics.getBackgroundColor())
             love.graphics.origin()
             if love.draw then
-                love.draw(lag/TIME_PER_UPDATE, world, player, globalEntities)
+                love.draw(lag/TIME_PER_UPDATE, world, globalEntities)
             end
             love.graphics.present()
         end

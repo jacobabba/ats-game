@@ -69,6 +69,7 @@ do
     --gets all entities that have all requested components
     --signature should be a table containing names of required components
     --return table has structure {entity ids -> {component name -> component}}
+    --  not only the ones that match the sig
     function index:getEntsFromSig(signature)
         --entities maps {entity id -> {component type -> component}}
         local entities = {}
@@ -77,9 +78,18 @@ do
         local n = 0
         for _ in ipairs(signature) do n = n + 1 end
 
+        if not self.components[signature[n]] then
+            error("Signature contains a component that doesn't exist")
+        end
+
+        --prepopulate the entities table with all of the entities that have
+        --the last component in the signature
         for k,v in pairs(self.components[signature[n]]) do
             entities[k] = {}
             entities[k][signature[n]] = v
+            for compk,compv in pairs(self.components) do
+                entities[k][compk] = compv[k]
+            end
         end
         signature[n] = nil
 
@@ -91,9 +101,7 @@ do
                     error("Signature contains a component that doesn't exist")
                 end
 
-                if self.components[sigv][entk] then
-                    entv[sigv] = self.components[sigv][entk]
-                else
+                if not self.components[sigv][entk] then
                     entv = nil
                 end
             end

@@ -4,7 +4,8 @@
 --component signature: transform, movement, rigid
 
 do
-    --NOTE: for two moving objects, find point at which they share an x/y coord, and check if the two lines intersect.
+    --NOTE: for two moving objects, find point at which they share 
+    --an x/y coord, and check if the two lines intersect.
     
     --[[
         Since the only level objects that can alter the player's trajectory are
@@ -56,11 +57,11 @@ do
     --]]
     
     --TODO:clean these functions up
+    --TODO: document this better
     
-    --returns 1 if no collision happens, otherwise returns the time that 
+    --returns 1 if no collision happens, otherwise returns the fraction of time that 
     --the collision happened
     local function findSingleAxisCollision(level, pX, pW, pVX, pY, pH, pVY, invert) 
-        -- TODO: document this better
         if pVY == 0 then return 1 end
         local startLineX1 = pX
         local startLineX2 = pX + pW
@@ -135,28 +136,28 @@ do
                                                 v.transform.xPosition, v.transform.width, 
                                                 v.motion.xVelocity, true) 
 
-            if ctx == 1 and cty == 1 then --no collision happened
-                return
-            elseif ctx <= cty then --horizontal happened first
-                local tpX = v.transform.xPosition + v.motion.xVelocity*ctx
-                local tpY = v.transform.yPosition + v.motion.yVelocity*ctx
-        
-                cty = findSingleAxisCollision(world:getCurrentLevel().tileGrid,
-                                              tpX, v.transform.width, 0, tpY, 
-                                              v.transform.height, 
-                                              v.motion.yVelocity*(1-ctx), false) 
-        
-                cty = ctx + (1-ctx)*cty
-            elseif ctx > cty then --vertical happened first
-                local tpX = v.transform.xPosition + v.motion.xVelocity*cty
-                local tpY = v.transform.yPosition + v.motion.yVelocity*cty
-        
-                ctx = findSingleAxisCollision(world:getCurrentLevel().tileGrid,
-                                              tpY, v.transform.height, 0, tpX, 
-                                              v.transform.width, 
-                                              v.motion.xVelocity*(1-cty), true) 
-        
-                ctx = cty + (1-cty)*ctx
+            if ctx ~= 1 or cty ~= 1 then --check if a collision happened
+                if ctx <= cty then --horizontal happened first
+                    local tpX = v.transform.xPosition + v.motion.xVelocity*ctx
+                    local tpY = v.transform.yPosition + v.motion.yVelocity*ctx
+
+                    cty = findSingleAxisCollision(world:getCurrentLevel().tileGrid,
+                                                  tpX, v.transform.width, 0, tpY, 
+                                                  v.transform.height, 
+                                                  v.motion.yVelocity*(1-ctx), false) 
+
+                    cty = ctx + (1-ctx)*cty
+                elseif ctx > cty then --vertical happened first
+                    local tpX = v.transform.xPosition + v.motion.xVelocity*cty
+                    local tpY = v.transform.yPosition + v.motion.yVelocity*cty
+
+                    ctx = findSingleAxisCollision(world:getCurrentLevel().tileGrid,
+                                                  tpY, v.transform.height, 0, tpX, 
+                                                  v.transform.width, 
+                                                  v.motion.xVelocity*(1-cty), true) 
+
+                    ctx = cty + (1-cty)*ctx
+                end
             end
 
             --check if we're landing on ground

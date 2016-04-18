@@ -42,6 +42,12 @@ do
     }
 
     --defines data specific to lines
+    --a line should also have the colorState component
+    --segments maps {id -> {x, y, width, height}}
+    --x,y is the levelgrid coords of the upper left most part of this segment
+    --width is the number of grid spaces the segment spans to the right
+    --height is the number of grid spaces the segment spans downwards
+    --only one of the previous two fields (width,height) should exist in each segment
     types.line = componentClass:newSubClass{
         segments = nil
     }

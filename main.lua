@@ -27,6 +27,7 @@ function love.load()
 
     local globalEntities = ENTITY_MANAGER_CLASS:newManager()
 
+    --add the player
     globalEntities:addEntity(
         {
             player = {},

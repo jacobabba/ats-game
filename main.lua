@@ -6,6 +6,17 @@ LEVEL_HEIGHT = 30
 LEVEL_WIDTH = 40
 TILE_SIZE = 20
 
+COLOR_CODES = {
+    white = {
+        255, 255, 255
+    },
+
+    red = {
+        247, 39, 39
+    }
+}
+
+
 ENTITY_MANAGER_CLASS = require("entity_manager")
 SYSTEMS_MANAGER = dofile("systems/systems_manager.lua")
 
@@ -39,12 +50,30 @@ function love.load()
             },
             motion = {},
             rigid = {},
-            drawable = {}
+            drawable = {},
+            colorState = {}
         },
         "player"
     )
 
-
+    --line test
+    globalEntities:addEntity(
+        {
+            line = {
+                segments = {{
+                    x = 3,
+                    y = 1,
+                    height = 29
+                }}
+            },
+            colorState = {
+                state = "red"
+            },
+            drawable = {
+                drawType = "line"
+            }
+        }
+    )
 
     return world, keyList, globalEntities
 end
@@ -65,6 +94,7 @@ function love.update(dt, world, keyList, globalEntities)
 
     SYSTEMS_MANAGER:playerSystem(managers, keyList)
     SYSTEMS_MANAGER:levelCollisionSystem(managers, world)
+    SYSTEMS_MANAGER:lineCollisionSystem(managers, world)
     SYSTEMS_MANAGER:movementSystem(managers)
     SYSTEMS_MANAGER:levelNavSystem(managers, world)
     

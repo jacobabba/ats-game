@@ -14,6 +14,7 @@ do
             for kk,vv in pairs(e) do
                 entities[n] = vv
                 indexToManagerId[n] = {manager = k, id = kk}
+                n = n + 1
             end
         end
 
@@ -26,6 +27,7 @@ do
     systemManager.levelNavSystem = dofile("systems/level_nav_system.lua")
     systemManager.playerSystem = dofile("systems/player_system.lua")
     systemManager.drawSystem = dofile("systems/draw_system.lua")
+    systemManager.lineCollisionSystem = dofile("systems/line_collision_system.lua")
 
     return systemManager
 end

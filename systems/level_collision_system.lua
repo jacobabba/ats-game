@@ -56,8 +56,9 @@ do
         We can also compute ct first and substitue it in when computing cl.
     --]]
     
-    --TODO:clean these functions up
+    --TODO: clean these functions up?
     --TODO: document this better
+    --TODO: make sure this isn't buggy
     
     --returns 1 if no collision happens, otherwise returns the fraction of time that 
     --the collision happened

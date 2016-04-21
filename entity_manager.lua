@@ -95,14 +95,14 @@ do
 
         for sigk,sigv in ipairs(signature) do
             for entk,entv in pairs(entities) do
-                --if this entity has this component, add that component to the entity list
-                --otherwise, remove that entity from our list
+                --if this entity has this component, keep it in the list
+                --otherwise, remove that entity
                 if not self.components[sigv] then
                     error("Signature contains a component that doesn't exist")
                 end
 
                 if not self.components[sigv][entk] then
-                    entv = nil
+                    entities[entk] = nil
                 end
             end
         end

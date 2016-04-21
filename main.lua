@@ -1,4 +1,6 @@
 require("run")
+prof = require 'ProFi'
+prof:start()
 
 DATA_FILE = "editor/DATA.lua"
 
@@ -78,9 +80,9 @@ function love.load()
     return world, keyList, globalEntities
 end
 
-function love.update(dt, world, keyList, globalEntities)
+function love.update(world, keyList, globalEntities)
     --check inputs
-    for k, v in pairs(keyList) do
+    for _, v in pairs(keyList) do
         if love.keyboard.isDown(v.key) then
             v.pressed = true
             v.frame = v.frame + 1
@@ -114,4 +116,9 @@ function love.draw(interpolate, world, globalEntities)
     love.graphics.print(love.timer.getFPS(), 0, 10)
     love.graphics.print(world.shiftX, 200, 10)
     love.graphics.print(world.shiftY, 400, 10)
+end
+
+function love.quit()
+    prof:stop()
+    prof:writeReport("profile.txt")
 end

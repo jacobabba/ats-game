@@ -16,16 +16,16 @@
 
 do
     local lineCollisionSystem = function (self, entityManagers, world)
-        local lines, lineIndexToManagerId =
+        local lines, _ =
             self.getEntities(entityManagers, {"line", "colorState"})
 
-        local stateActors, stateActorIndexToManagerId =
+        local stateActors, _ =
             self.getEntities(entityManagers, {"transform", "motion", "colorState"})
 
         --Find which tile "centers" each actor is passing through,
         --and then find if there's a line at those centers.
         --Based on the algorithm from the level collision system.
-        for k,v in ipairs(stateActors) do
+        for _,v in ipairs(stateActors) do
             --the only point that matters on the actor is its center
             local prevx = v.transform.xPosition + v.transform.width/2
             local nextx = prevx + v.motion.xVelocity

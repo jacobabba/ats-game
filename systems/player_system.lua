@@ -2,10 +2,10 @@
 
 do
     local playerSystem = function (self, entityManagers, keyList)
-        local entities, indexToManagerId = 
+        local entities, _ = 
             self.getEntities(entityManagers, {"player", "motion", "rigid"})
 
-        for k,v in ipairs(entities) do
+        for _,v in ipairs(entities) do
             --apply vertical acceleration
             if keyList.jump.pressed and keyList.jump.frame == 1 and v.rigid.isOnGround then
                 --jump

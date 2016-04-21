@@ -15,7 +15,7 @@ do
     function index:addEntity(components, uid)
         --find first unused id
         local id = 0
-        for k,v in ipairs(self.entityIds) do id = k end
+        for k in ipairs(self.entityIds) do id = k end
         id = id + 1
         self.entityIds[id] = true
 
@@ -47,7 +47,7 @@ do
             end
         end
 
-        for k,v in pairs(self.components) do
+        for _,v in pairs(self.components) do
             v[id] = nil
         end
     end
@@ -89,8 +89,8 @@ do
         end
 
         --TODO: figure out a good way to not repeat the first element in the signature
-        for sigk,sigv in ipairs(signature) do
-            for entk,entv in pairs(entities) do
+        for _,sigv in ipairs(signature) do
+            for entk in pairs(entities) do
                 --if this entity has this component, keep it in the list
                 --otherwise, remove that entity
                 if not self.components[sigv] then
@@ -106,19 +106,6 @@ do
         return entities
     end
 
-    --for debug purposes. prints a list of all entities and their data
-    function index:display()
-        local inspect = require("inspect")
-        for k,v in pairs(self.entityIds) do
-            for kk,vv in pairs(self.components) do
-                if vv[k] then
-                    print("entity id:"..k.." component:"..kk)
-                    print(inspect(vv[k]))
-                end
-            end
-        end
-    end
-    
     local entityManagerClass = {}
     entityManagerClass.mt = {__index = index}
 
@@ -135,7 +122,7 @@ do
 
         --the components table maps {component type -> {entity id -> component}}
         manager.components = {}
-        for k,v in pairs(manager.componentTypes) do
+        for k in pairs(manager.componentTypes) do
             manager.components[k] = {}
         end
 

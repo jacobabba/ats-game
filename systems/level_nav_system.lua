@@ -3,7 +3,7 @@
 
 do
     local levelNavSystem = function (self, entityManagers, world)
-        local entities, indexToManagerId = 
+        local entities, _ = 
             self.getEntities(entityManagers, {"player", "transform"})
         
         --there should only be one player, so only the first member of entities is checked

@@ -4,10 +4,10 @@
 
 do
     local drawSystem = function (self, entityManagers, world, interpolate)
-        local entities, indexToManagerId = 
+        local entities, _ = 
             self.getEntities(entityManagers, {"drawable"})
 
-        for k,v in ipairs(entities) do
+        for _,v in ipairs(entities) do
             local x, y
             if v.transform then
                 x = v.transform.xPosition + world.shiftX

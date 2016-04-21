@@ -84,7 +84,7 @@ do
             return 1
         else
             -- We are crossing a grid line
-            local cty, clx, crx, xcoordl, xcoordr, ycoord
+            local cty, clx, crx, xcoordl, xcoordr, ycoordl, ycoordr
     
             cty = (cy-mod*startLineY)/(mod*endLineY - mod*startLineY)
             clx = cty*(endLineX1-startLineX1) + startLineX1
@@ -119,10 +119,10 @@ do
     end
  
     local levelCollisionSystem = function (self, entityManagers, world)
-        local entities, indexToManagerId =
+        local entities, _ =
             self.getEntities(entityManagers, {"transform", "motion", "rigid"})
 
-        for k,v in ipairs(entities) do
+        for _,v in ipairs(entities) do
             --find vertical collision
             local cty = findSingleAxisCollision(world:getCurrentLevel().tileGrid,
                                                 v.transform.xPosition, v.transform.width, 

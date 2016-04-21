@@ -39,7 +39,7 @@ function love.run()
         -- Call update and draw
         while lag >= TIME_PER_UPDATE do
             -- will pass 0 if love.timer is disabled
-            if love.update then love.update(dt, world, keyList, globalEntities) end 
+            if love.update then love.update(world, keyList, globalEntities) end 
             lag = lag - TIME_PER_UPDATE
         end
 

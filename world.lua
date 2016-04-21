@@ -15,26 +15,31 @@ do
     
     --make a new level with coords x,y in the world
     --uses g as the level's grid
-    function w:newLevel(x, y, g)
+    function w:newLevel(x, y, grid, entities)
         self.levelGrid[x] = self.levelGrid[x] or {}
         if self.levelGrid[x][y] then error("attempt to add a level that already exists") end
     
         local l = {}
     
-        g = g or {}
+        grid = grid or {}
         for i=1,LEVEL_WIDTH do
-            g[i] = g[i] or {}
+            grid[i] = grid[i] or {}
             for j=1,LEVEL_HEIGHT do
-                g[i][j] = g[i][j] or 0
+                grid[i][j] = grid[i][j] or 0
             end
         end
-        l.tileGrid = g
-    
+        l.tileGrid = grid
+
+        l.entityManager = ENTITY_MANAGER_CLASS:newManager()
+        for k,v in ipairs(entities or {}) do
+            l.entityManager:addEntity(v, k)
+        end
+
         self.levelGrid[x][y] = l
     end
 
     function w:getEntityManager(levelX, levelY)
-        --TODO
+        return self.levelGrid[levelX][levelY].entityManager
     end
     
     function w:drawLevel()
@@ -44,7 +49,8 @@ do
         for i=1,LEVEL_WIDTH do
             for j=1,LEVEL_HEIGHT do
                 if l.tileGrid[i][j] == 1 then
-                    love.graphics.rectangle("fill", (i-1)*s+self.shiftX, (j-1)*s+self.shiftY, s, s)
+                    love.graphics.rectangle("fill", (i-1)*s+self.shiftX,
+                                            (j-1)*s+self.shiftY, s, s)
                 end
             end
         end
@@ -60,12 +66,12 @@ do
             for i=1,LEVEL_WIDTH do
                 for j=1,LEVEL_HEIGHT do
                     if l.tileGrid[i][j] == 1 then
-                        love.graphics.rectangle("fill", (i-1)*s+self.shiftX+xs*lw, (j-1)*s+self.shiftY+ys*lh, s, s)
+                        love.graphics.rectangle("fill", (i-1)*s+self.shiftX+xs*lw,
+                                                (j-1)*s+self.shiftY+ys*lh, s, s)
                     end
                 end
             end
         end
-    
     end
     
     function w:changeLevel(x, y)
@@ -101,8 +107,8 @@ do
 
     --load the world from a file (s)
     function w:loadWorld(s)
-        function _levelEntry(levelX, levelY, g)
-            self:newLevel(levelX, levelY, g)
+        function _levelEntry(levelX, levelY, grid, entities)
+            self:newLevel(levelX, levelY, grid, entities)
         end
 
         function _playerSpawn(levelX, levelY, tileX, tileY)

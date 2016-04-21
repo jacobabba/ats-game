@@ -39,6 +39,7 @@ do
                 or (v.motion.yVelocity < 0) and -1
                 or 0
 
+            --HORIZONTAL COLLISIONS--
             --Find the next critical point in the direction the player is moving.
             local cx = (modx*prevx-modx*TILE_SIZE/2)%TILE_SIZE
             if cx == 0 and modx == -1 then cx = 20 end
@@ -72,6 +73,42 @@ do
                 end
 
                 cx = cx + modx*TILE_SIZE
+            end
+
+            --VERTICAL COLLISIONS
+            --Find the next critical point in the direction the player is moving.
+            local cy = (mody*prevy-mody*TILE_SIZE/2)%TILE_SIZE
+            if cy == 0 and mody == -1 then cy = 20 end
+            cy = prevy-mody*(cy-TILE_SIZE)
+
+            --Find if the actor passed the critical point
+            while mody == 1 and cy <= nexty or mody == -1 and cy > nexty do
+                --the coordinates of the tile where cx resides
+                local tiley = cy/TILE_SIZE + .5
+                local cty = (cy-prevy)/(nexty-prevy)
+                local tilex = math.ceil((cty*(nextx-prevx)+prevx)/TILE_SIZE)
+
+                --find if a line of this type exists on this tile
+                for _,linev in ipairs(lines) do
+                    for _,segv in ipairs(linev.line.segments) do
+                        if segv.width and segv.y == tiley
+                        and tilex>=segv.x and tilex<segv.x+segv.width then
+                            --line collision
+                            local temp = v.colorState.state
+                            v.colorState.state = linev.colorState.state
+                            linev.colorState.state = temp
+
+                            --update linked lines
+                            for _,linkv in pairs(linev.line.links or {}) do
+                                local e = world:getEntityManager(linkv.levelx, linkv.levely)
+                                e = e.getEntity(linkv.uid)
+                                if e then e.colorState.state = temp end
+                            end
+                        end
+                    end
+                end
+
+                cy = cy + mody*TILE_SIZE
             end
         end
     end

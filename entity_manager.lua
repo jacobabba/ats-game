@@ -74,25 +74,21 @@ do
         --entities maps {entity id -> {component type -> component}}
         local entities = {}
 
-        --get table length
-        local n = 0
-        for _ in ipairs(signature) do n = n + 1 end
-
-        if not self.components[signature[n]] then
+        if not self.components[signature[1]] then
             error("Signature contains a component that doesn't exist")
         end
 
         --prepopulate the entities table with all of the entities that have
-        --the last component in the signature
-        for k,v in pairs(self.components[signature[n]]) do
+        --the first component in the signature
+        for k,v in pairs(self.components[signature[1]]) do
             entities[k] = {}
-            entities[k][signature[n]] = v
+            entities[k][signature[1]] = v
             for compk,compv in pairs(self.components) do
                 entities[k][compk] = compv[k]
             end
         end
-        signature[n] = nil
 
+        --TODO: figure out a good way to not repeat the first element in the signature
         for sigk,sigv in ipairs(signature) do
             for entk,entv in pairs(entities) do
                 --if this entity has this component, keep it in the list

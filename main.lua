@@ -56,7 +56,7 @@ function love.load()
         "player"
     )
 
-    --line test
+    --[[line test
     globalEntities:addEntity(
         {
             line = {
@@ -73,7 +73,7 @@ function love.load()
                 drawType = "line"
             }
         }
-    )
+    )]]
 
     return world, keyList, globalEntities
 end
@@ -90,7 +90,7 @@ function love.update(dt, world, keyList, globalEntities)
         end
     end
 
-    local managers = {globalEntities}
+    local managers = {globalEntities, world:getCurrentLevel().entityManager}
 
     SYSTEMS_MANAGER:playerSystem(managers, keyList)
     SYSTEMS_MANAGER:levelCollisionSystem(managers, world)
@@ -104,7 +104,7 @@ end
 function love.draw(interpolate, world, globalEntities)
     world:drawLevel()
 
-    local managers = {globalEntities}
+    local managers = {globalEntities, world:getCurrentLevel().entityManager}
 
     SYSTEMS_MANAGER:drawSystem(managers, world, interpolate)
 

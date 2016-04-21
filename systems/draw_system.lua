@@ -6,7 +6,7 @@ do
     local drawSystem = function (self, entityManagers, world, interpolate)
         local entities, indexToManagerId = 
             self.getEntities(entityManagers, {"drawable"})
-        
+
         for k,v in ipairs(entities) do
             local x, y
             if v.transform then
@@ -31,17 +31,17 @@ do
                 for _,segv in ipairs(v.line.segments) do
                     if segv.width then
                         love.graphics.line(
-                            (segv.x-1)*TILE_SIZE,
-                            (segv.y-.5)*TILE_SIZE,
-                            (segv.x-1+segv.width)*TILE_SIZE,
-                            (segv.y-.5)*TILE_SIZE
+                            (segv.x-1)*TILE_SIZE+world.shiftX,
+                            (segv.y-.5)*TILE_SIZE+world.shiftY,
+                            (segv.x-1+segv.width)*TILE_SIZE+world.shiftX,
+                            (segv.y-.5)*TILE_SIZE+world.shiftY
                         )
                     elseif segv.height then
                         love.graphics.line(
-                            (segv.x-.5)*TILE_SIZE,
-                            (segv.y-1)*TILE_SIZE,
-                            (segv.x-.5)*TILE_SIZE,
-                            (segv.y-1+segv.height)*TILE_SIZE
+                            (segv.x-.5)*TILE_SIZE+world.shiftX,
+                            (segv.y-1)*TILE_SIZE+world.shiftY,
+                            (segv.x-.5)*TILE_SIZE+world.shiftX,
+                            (segv.y-1+segv.height)*TILE_SIZE+world.shiftY
                         )
                     end
                 end

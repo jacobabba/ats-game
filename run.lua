@@ -14,6 +14,9 @@ function love.run()
     local dt = 0
     local lag = 0
 
+    prof = require("ProFi")
+    prof:start()
+
     -- Main loop time.
     while true do
         -- Process events.

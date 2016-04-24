@@ -1,6 +1,4 @@
 require("run")
-prof = require 'ProFi'
-prof:start()
 
 DATA_FILE = "editor/DATA.lua"
 

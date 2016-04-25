@@ -40,6 +40,7 @@ do
                 or 0
 
             --HORIZONTAL COLLISIONS--
+            --(collisions as a result of the actor's horizontal velocity)
             --Find the next critical point in the direction the player is moving.
             local cx = (modx*prevx-modx*TILE_SIZE/2)%TILE_SIZE
             if cx == 0 and modx == -1 then cx = 20 end
@@ -76,6 +77,7 @@ do
             end
 
             --VERTICAL COLLISIONS
+            --(collisions as a result of the actor's vertical velocity)
             --Find the next critical point in the direction the player is moving.
             local cy = (mody*prevy-mody*TILE_SIZE/2)%TILE_SIZE
             if cy == 0 and mody == -1 then cy = 20 end

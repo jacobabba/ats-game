@@ -7,15 +7,10 @@ LEVEL_WIDTH = 40
 TILE_SIZE = 20
 
 COLOR_CODES = {
-    white = {
-        255, 255, 255
-    },
-
-    red = {
-        247, 39, 39
-    }
+    white = {255, 255, 255},
+    red = {247, 39, 39},
+    blue = {55, 125, 150}
 }
-
 
 ENTITY_MANAGER_CLASS = require("entity_manager")
 SYSTEMS_MANAGER = dofile("systems/systems_manager.lua")
@@ -55,25 +50,6 @@ function love.load()
         },
         "player"
     )
-
-    --[[line test
-    globalEntities:addEntity(
-        {
-            line = {
-                segments = {{
-                    x = 3,
-                    y = 1,
-                    height = 29
-                }}
-            },
-            colorState = {
-                state = "red"
-            },
-            drawable = {
-                drawType = "line"
-            }
-        }
-    )]]
 
     return world, keyList, globalEntities
 end

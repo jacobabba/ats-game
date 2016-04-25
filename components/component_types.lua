@@ -29,7 +29,8 @@ do
     --entities that will colllide with the level should have this
     --component, the transform component, and the move component
     types.rigid = componentClass:newSubClass{
-        isOnGround = false
+        isOnGround = false,
+        tilesCollidedWith = {}
     }
 
     --defines data specific to the player
@@ -49,6 +50,7 @@ do
         --width is the number of grid spaces the segment spans to the right
         --height is the number of grid spaces the segment spans downwards
         --only one of the previous two fields (width,height) should exist in each segment
+        --behavior for negative values of width,height are undefined
         segments = nil,
 
         --links establishes a link between this line and lines on other levels,

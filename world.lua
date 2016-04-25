@@ -1,5 +1,11 @@
 do
     local w = {}
+
+    --maps the ids from the levelGrids to the color,
+    w.tileTypes = {
+        {255, 255, 255},
+        {247, 39, 39}
+    }
     
     w.levelGrid = {}
     w.levelX = 1
@@ -42,13 +48,14 @@ do
         return self.levelGrid[levelX][levelY].entityManager
     end
     
+    --TODO: optimize this...
     function w:drawLevel()
         local l = self.levelGrid[self.levelX][self.levelY]
         local s = TILE_SIZE
-        love.graphics.setColor(255, 255, 255)
         for i=1,LEVEL_WIDTH do
             for j=1,LEVEL_HEIGHT do
-                if l.tileGrid[i][j] == 1 then
+                if l.tileGrid[i][j] ~= 0 then
+                    love.graphics.setColor(self.tileTypes[l.tileGrid[i][j]])
                     love.graphics.rectangle("fill", (i-1)*s+self.shiftX,
                                             (j-1)*s+self.shiftY, s, s)
                 end
@@ -101,8 +108,8 @@ do
         self.shiftX = self.shiftX*0.90
         self.shiftY = self.shiftY*0.90
 
-        if self.shiftX < 1 and self.shiftX > -1 then self.shiftX = 0 end
-        if self.shiftY < 1 and self.shiftY > -1 then self.shiftY = 0 end
+        if self.shiftX < .5 and self.shiftX > -.5 then self.shiftX = 0 end
+        if self.shiftY < .5 and self.shiftY > -.5 then self.shiftY = 0 end
     end
 
     --load the world from a file (s)

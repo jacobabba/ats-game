@@ -12,35 +12,19 @@ do
 
     _t[0] = {
         name = "Blank",
-        hasLine = false,
         hasBox = false
     }
 
     _t[1] = {
         name = "Regular Tile",
-        boxColorR = 255,
-        boxColorG = 255,
-        boxColorB = 255,
-        hasLine = false,
+        color = {255, 255, 255}
         hasBox = true
     }
 
-    _t[12] = {
-        name = "Regular Line",
-        lineColorR = 255,
-        lineColorG = 255,
-        lineColorB = 255,
-        hasLine = true,
-        hasBox = false
-    }
-
-    _t[13] = {
-        name = "Double Jump Line",
-        lineColorR = 128,
-        lineColorG = 168,
-        lineColorB = 124,
-        hasLine = true,
-        hasBox = false
+    _t[2] = {
+        name = "Death Tile",
+        color = {247, 39, 39},
+        hasBox = true
     }
 
     return _t

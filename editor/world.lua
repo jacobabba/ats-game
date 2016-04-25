@@ -104,31 +104,6 @@ do
                         love.graphics.setColor(t.boxColorR, t.boxColorG, t.boxColorB)
                         love.graphics.rectangle("fill", xPos, yPos, s, s)
                     end
-
-                    --figure out drawing for lines
-                    if t and t.hasLine then
-                        love.graphics.setColor(t.lineColorR, t.lineColorG, t.lineColorB)
-                        love.graphics.setLineStyle("rough")
-                        love.graphics.setLineWidth(2)
-
-                        --find out whether the immediate tiles are the same line type as this one
-                        local up = (lg[i][j-1] == t_id) and true or false
-                        local down = (lg[i][j+1] == t_id) and true or false
-                        local left = (lg[i-1] and lg[i-1][j] == t_id) and true or false
-                        local right = (lg[i+1] and lg[i+1][j] == t_id) and true or false
-
-                        
-                        if not (left or right) then
-                            love.graphics.line(xPos+s/2, yPos, xPos+s/2, yPos+s)
-                        elseif (left or right) and not (up or down) then
-                            love.graphics.line(xPos, yPos+s/2, xPos+s, yPos+s/2)
-                        else
-                            if up then love.graphics.line(xPos+s/2, yPos, xPos+s/2, yPos+s/2) end
-                            if down then love.graphics.line(xPos+s/2, yPos+s/2, xPos+s/2, yPos+s) end
-                            if left then love.graphics.line(xPos, yPos+s/2, xPos+s/2, yPos+s/2) end
-                            if right then love.graphics.line(xPos+s/2, yPos+s/2, xPos+s, yPos+s/2) end
-                        end
-                    end
                 end
             end
 

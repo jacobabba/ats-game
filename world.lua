@@ -21,9 +21,11 @@ do
     
     --make a new level with coords x,y in the world
     --uses g as the level's grid
-    function w:newLevel(x, y, grid, entities)
-        self.levelGrid[x] = self.levelGrid[x] or {}
-        if self.levelGrid[x][y] then error("attempt to add a level that already exists") end
+    function w:newLevel(levelX, levelY, grid, entities)
+        self.levelGrid[levelX] = self.levelGrid[levelX] or {}
+        if self.levelGrid[levelX][levelY] then 
+            error("attempt to add a level that already exists") 
+        end
     
         local l = {}
     
@@ -37,11 +39,11 @@ do
         l.tileGrid = grid
 
         l.entityManager = ENTITY_MANAGER_CLASS:newManager()
-        for k,v in ipairs(entities or {}) do
+        for k,v in pairs(entities or {}) do
             l.entityManager:addEntity(v, k)
         end
 
-        self.levelGrid[x][y] = l
+        self.levelGrid[levelX][levelY] = l
     end
 
     function w:getEntityManager(levelX, levelY)

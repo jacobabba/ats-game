@@ -17,7 +17,7 @@ do
 
     _t[1] = {
         name = "Regular Tile",
-        color = {255, 255, 255}
+        color = {255, 255, 255},
         hasBox = true
     }
 

@@ -14,9 +14,6 @@ do
 
     w.levelGrid = {}
 
-    w.levelClass = require("level")
-    w.objTypes = require("obj_types")
-
     --sets the tile in the specified level
     function w:setTile(levelX, levelY, x, y, tileType)
         if self.playerSpawn.levelX ~= levelX or self.playerSpawn.levelY ~= levelY
@@ -57,19 +54,27 @@ do
 
     --make a new level with coords x,y in the world
     --uses g as the level's grid
-    function w:newLevel(levelX, levelY, g)
+    function w:newLevel(levelX, levelY, grid, entities)
         self.levelGrid[levelX] = self.levelGrid[levelX] or {}
-        if self.levelGrid[levelX][levelY] then error("attempt to add a level that already exists") end
-
-        g = g or {}
-        for i=1,self.LEVEL_WIDTH do
-            g[i] = g[i] or {}
-            for j=1,self.LEVEL_HEIGHT do
-                g[i][j] = g[i][j] or 0
-            end
+        if self.levelGrid[levelX][levelY] then 
+            error("attempt to add a level that already exists") 
         end
 
-        local l = self.levelClass:newLevel(g)
+        local l = {}
+
+        grid = grid or {}
+        for i=1,self.LEVEL_WIDTH do
+            grid[i] = grid[i] or {}
+            for j=1,self.LEVEL_HEIGHT do
+                grid[i][j] = grid[i][j] or 0
+            end
+        end
+        l.tileGrid = grid
+        
+        l.entityManager = ENTITY_MANAGER_CLASS:newManager()
+        for k,v in pairs(entities or {}) do
+            l.entityManager:addEntity(v, k)
+        end
 
         self.levelGrid[levelX][levelY] = l
     end
@@ -101,7 +106,7 @@ do
                     local yPos = (j-1)*s+y
 
                     if t and t.hasBox then
-                        love.graphics.setColor(t.boxColorR, t.boxColorG, t.boxColorB)
+                        love.graphics.setColor(t.color)
                         love.graphics.rectangle("fill", xPos, yPos, s, s)
                     end
                 end
@@ -136,8 +141,8 @@ do
 
     --load the world from a file (s)
     function w:loadWorld(s)
-        function _levelEntry(levelX, levelY, g)
-            self:newLevel(levelX, levelY, g)
+        function _levelEntry(levelX, levelY, grid, entities)
+            self:newLevel(levelX, levelY, grid, entities)
         end
 
         function _playerSpawn(levelX, levelY, tileX, tileY)
@@ -151,14 +156,43 @@ do
     function w:saveWorld(s)
         local f = assert(io.open(s, "w"))
 
+        local function writeTable(table)
+            f:write("{")
+            local s = "\n"
+            for k,v in pairs(table) do
+                f:write(s)
+
+                if type(k) == "number" then
+                    f:write("["..k.."]")
+                else
+                    f:write(k)
+                end
+                f:write("=")
+
+                if type(v) == "table" then
+                    writeTable(v)
+                elseif type(v) == "string" then
+                    f:write('"'..v..'"')
+                elseif type(v) == "boolean" then
+                    f:write(tostring(v))
+                elseif type(v) == "number" then
+                    f:write(v)
+                end
+
+                s = ",\n"
+            end
+
+            f:write("\n}")
+        end
+
         for i,v in pairs(self.levelGrid) do
             for j,w in pairs(v) do
                 f:write("_levelEntry("..i..", "..j..", \n{ ")
 
                 --prime first column
                 f:write("{"..w.tileGrid[1][1])
-                for l=2,self.LEVEL_HEIGHT do
-                    f:write(", "..w.tileGrid[1][l])
+                for k=2,self.LEVEL_HEIGHT do
+                    f:write(", "..w.tileGrid[1][k])
                 end
                 f:write("}")
 
@@ -170,8 +204,11 @@ do
                     end
                     f:write("}")
                 end
+                f:write("\n},\n")
 
-                f:write("\n})\n\n")
+                --write the entities
+                writeTable(w.entityManager.entities)
+                f:write("\n)\n\n")
             end
         end
 

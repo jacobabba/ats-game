@@ -4,11 +4,14 @@
 -- Author: Jacob Abba
 -----------------------------------------------------------------
 
+ENTITY_MANAGER_CLASS = dofile("entity_manager.lua")
+SYSTEMS_MANAGER = dofile("systems/systems_manager.lua")
+
 function love.load()
     levelX = 1
     levelY = 1
 
-    TILE_TYPES = require("tile_types")
+    TILE_TYPES = require("editor/tile_types")
     tileType = 1
     tileSelect = ""
 
@@ -40,10 +43,10 @@ function love.load()
                       --rect: draw rectangles of tiles
                       --deletelevel: delete levels
 
-    DATAFILE = "DATA.lua"
+    DATAFILE = "editor/DATA.lua"
     timeSinceSwp = 0
 
-    world = require("world")
+    world = dofile("editor/world.lua")
     world:loadWorld(DATAFILE)
 
     WINDOW_WIDTH = world.TILE_SIZE*world.LEVEL_WIDTH*1.5
@@ -51,7 +54,7 @@ function love.load()
 
     love.window.setMode(WINDOW_WIDTH, WINDOW_HEIGHT)
 
-    rect = require("rect")
+    rect = dofile("editor/rect.lua")
 end
 
 function love.update(dt)
@@ -205,7 +208,8 @@ function love.draw()
         love.graphics.setColor(255, 255, 255)
         love.graphics.print("Controls:\n".."Arrow keys - move levels\n"
                             .."g - toggle grid\n".."s - save changes\n"
-                            .."e - toggle expanded view\n\n".."Editing modes:\n"
+                            .."e - toggle expanded view\n"
+                            .."q - set player spawn point\n\n".."Editing modes:\n"
                             .."r - rect mode "..(editMode=="rect" and "(on)" or "(off)")
                             .."\nf - free mode "..(editMode=="free" and "(on)" or "(off)")
                             .."\nx - delete level "

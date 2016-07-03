@@ -38,8 +38,8 @@ do
         MAX_HSPEED = 3,
         HACCEL = .3,
         MAX_VSPEED = 8,
-        VACCEL_GRAVITY = .5,
-        VACCEL_JUMP = 11
+        VACCEL_GRAVITY = .3,
+        VACCEL_JUMP = 9
     }
 
     --defines data specific to lines

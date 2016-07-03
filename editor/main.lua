@@ -263,7 +263,9 @@ function love.quit()
         love.window.showMessageBox(
             " ",
             "Would you like to save before closing?",
-            {"Yes", "No", "Cancel", enterbutton=1, escapebutton=3}
+            {"Yes", "No", "Cancel", enterbutton=1, escapebutton=3},
+            "info",
+            true
         )
 
     if messageChoice == 1 then

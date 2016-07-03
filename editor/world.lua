@@ -119,6 +119,10 @@ do
                                         (self.playerSpawn.tileY-1)*s+y, s, s)
             end
 
+            --draw drawable components
+            local le = self.levelGrid[levelX][levelY].entityManager
+            le.getEntsFromSig({"drawable"})
+
             --draw grid
             if showGrid then
                 love.graphics.setColor(127, 127, 127)

@@ -75,6 +75,7 @@ do
             for i=1,LEVEL_WIDTH do
                 for j=1,LEVEL_HEIGHT do
                     if l.tileGrid[i][j] == 1 then
+                        love.graphics.setColor(self.tileTypes[l.tileGrid[i][j]])
                         love.graphics.rectangle("fill", (i-1)*s+self.shiftX+xs*lw,
                                                 (j-1)*s+self.shiftY+ys*lh, s, s)
                     end

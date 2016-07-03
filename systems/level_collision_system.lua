@@ -113,7 +113,9 @@ do
             end
     
             if level[xcoordl] and level[xcoordl][ycoordl] ~= 0 
-            or level[xcoordr] and level[xcoordr][ycoordr] ~= 0 then
+            and level[xcoordl][ycoordl]
+            or level[xcoordr] and level[xcoordr][ycoordr] ~= 0
+            and level[xcoordr][ycoordr] then
                 --collision! return the time of the collision and the types
                 --of tile(s) that we're colliding with
                 return cty, (level[xcoordl] and level[xcoordl][ycoordl]), 
